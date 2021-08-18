@@ -74,7 +74,7 @@ export class TextEditor {
       event.preventDefault();
       if (ModifierMap.has(event.key)) {
         if (event.repeat) return;
-        this.keyState.mods |= <Modifiers>ModifierMap.get(event.key);
+        this.keyState.mods |= ModifierMap.get(event.key);
         this.LOGGER.DEBUG(pp`Mod key pressed: ${event.key}`);
         this.LOGGER.TRACE(pp`this.keyState=${this.keyState}`);
         return;
@@ -85,13 +85,11 @@ export class TextEditor {
         plugin.provider.onKeyPressed(event.key, state);
       }
       this.setState(state);
-      // if (IgnoredKeys.includes(event.key)) return;
-      // this.keyInput(event);
     });
 
     this.editor.addEventListener("keyup", (event) => {
       if (ModifierMap.has(event.key)) {
-        this.keyState.mods ^= <Modifiers>ModifierMap.get(event.key);
+        this.keyState.mods ^= ModifierMap.get(event.key);
         this.LOGGER.TRACE(pp`this.keyState=${this.keyState}`);
         return;
       }
