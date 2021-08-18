@@ -1,0 +1,17 @@
+{
+  "name": "sourc",
+  "version": "1.0.0",
+  "description": "Lightweight modern online code editor",
+  "main": "js/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "editor",
+    "code",
+    "web",
+    "sourc"
+  ],
+  "author": "TheOneAndOnly",
+  "license": "ISC"
+}
