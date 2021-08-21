@@ -19,10 +19,8 @@ more.
   - Single character input
   - Single character deleting
   - Arrow key movement
-- Plugin based code injection system allowing
-  for utmost interoperability, expressiveness, and
-  extensibility
-- A powerful, simple to use extensible
+- Plugin based code injection system.
+- A powerful, simple to use
   logging system.
 
 **This is a synopsis.
