@@ -1,5 +1,5 @@
-import { DOM_TOOLS_LOGGER } from "../private-loggers.js";
-import { assert } from "./assert.js";
+import { DOM_TOOLS_LOGGER } from "../private-loggers";
+import { assert } from "./assert";
 
 export type CaretSelection = { start: number; end: number };
 

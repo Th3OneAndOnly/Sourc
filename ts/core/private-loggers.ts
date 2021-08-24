@@ -1,13 +1,13 @@
-import { Logger, ConsoleLogStrategy } from "./logger.js";
+import { Logger, ConsoleLogStrategy } from './logger';
 
 export const DOM_TOOLS_LOGGER = new Logger()
-  .withName("dom-tools.ts")
+  .withName('dom-tools.ts')
   .withStrategy(ConsoleLogStrategy);
 
 export const PLUGIN_LOGGER = new Logger()
-  .withName("plugin.ts")
+  .withName('plugin.ts')
   .withStrategy(ConsoleLogStrategy);
 
 export const CORE_LOGGER = new Logger()
-  .withName("SOURC_CORE")
+  .withName('SOURC_CORE')
   .withStrategy(ConsoleLogStrategy);

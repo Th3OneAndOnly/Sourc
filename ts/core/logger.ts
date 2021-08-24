@@ -1,4 +1,4 @@
-import { assert } from "./tool/assert.js";
+import { assert } from './tool/assert';
 
 class LoggingError extends Error {}
 
@@ -8,7 +8,7 @@ export enum LogLevel {
   INFO = 1 << 2,
   WARN = 1 << 3,
   ERROR = 1 << 4,
-  FATAL = 1 << 5,
+  FATAL = 1 << 5
 }
 const LogLevelALL =
   LogLevel.TRACE |
@@ -25,7 +25,7 @@ export type LogStrategy = (
 ) => void;
 
 export class Logger {
-  private name: string = "";
+  private name: string = '';
 
   private logLevels: LogLevel = LogLevelALL;
 
@@ -43,7 +43,7 @@ export class Logger {
 
   private logMessage(level: LogLevel, message: string) {
     if (this.logStrategy == null) {
-      throw new LoggingError("No LogStrategy registered!");
+      throw new LoggingError('No LogStrategy registered!');
     }
     if (this.enabled && this.logLevels & level) {
       this.logStrategy(level, this.name, message);
@@ -119,7 +119,7 @@ export class Logger {
   }
 
   public TRACK<T>(obj: T, name?: string): T {
-    this.logMessage(LogLevel.TRACE, `${name ? name + ": " : ""}${obj}`);
+    this.logMessage(LogLevel.TRACE, `${name ? name + ': ' : ''}${obj}`);
     return obj;
   }
 
@@ -163,12 +163,12 @@ export class Logger {
 
 export const ConsoleLogStrategy: LogStrategy = (level, name, message) => {
   const LogLevelToCss = {
-    [LogLevel.TRACE]: "color: hsl(0, 0%, 35%);",
-    [LogLevel.DEBUG]: "color: hsl(0, 0%, 45%);",
-    [LogLevel.INFO]: "color: white;",
-    [LogLevel.WARN]: "color: orange;",
-    [LogLevel.ERROR]: "color: hsl(15, 90%, 65%);",
-    [LogLevel.FATAL]: "color: red; font-weight: bold;",
+    [LogLevel.TRACE]: 'color: hsl(0, 0%, 35%);',
+    [LogLevel.DEBUG]: 'color: hsl(0, 0%, 45%);',
+    [LogLevel.INFO]: 'color: white;',
+    [LogLevel.WARN]: 'color: orange;',
+    [LogLevel.ERROR]: 'color: hsl(15, 90%, 65%);',
+    [LogLevel.FATAL]: 'color: red; font-weight: bold;'
   };
   console.log(
     `%c[${name}] ${LogLevel[level]}: ${message}`,
@@ -271,14 +271,14 @@ export class LoggerPool<T extends { [s: string]: Logger }> {
 
   public enableLogger(loggerName: keyof T): this {
     const logger = this.loggers[loggerName];
-    assert(logger != null, "Name is not a valid logger!");
+    assert(logger != null, 'Name is not a valid logger!');
     logger.enabled = true;
     return this;
   }
 
   public disableLogger(loggerName: keyof T): this {
     const logger = this.loggers[loggerName];
-    assert(logger != null, "Name is not a valid logger!");
+    assert(logger != null, 'Name is not a valid logger!');
     logger.enabled = false;
     return this;
   }
@@ -298,5 +298,5 @@ export class LoggerPool<T extends { [s: string]: Logger }> {
   }
 }
 
-export const CLIENT_LOGGER = new Logger().withName("CLIENT_SOURC_APP");
+export const CLIENT_LOGGER = new Logger().withName('CLIENT_SOURC_APP');
 CLIENT_LOGGER.registerLoggingStrategy(ConsoleLogStrategy);

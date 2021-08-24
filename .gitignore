@@ -1,1 +1,3 @@
 js/
+index.html # For stackblitz. I like to use it
+index.ts

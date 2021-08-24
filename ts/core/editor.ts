@@ -1,15 +1,15 @@
-import { Logger, ConsoleLogStrategy } from "./logger.js";
-import { stringToHTML } from "./tool/conversion.js";
+import { Logger, ConsoleLogStrategy } from "./logger";
+import { stringToHTML } from "./tool/conversion";
 import {
   CaretSelection,
   getCaretSelection,
   setSelection,
-} from "./tool/dom-tools.js";
-import { clamp, partial } from "./tool/general.js";
-import { assertWithLogger } from "./tool/assert.js";
-import { EditorState, SourcPlugin } from "./plugin.js";
-import { pp } from "./tool/string.js";
-import { CorePlugin } from "./core.js";
+} from "./tool/dom-tools";
+import { clamp, partial } from "./tool/general";
+import { assertWithLogger } from "./tool/assert";
+import { EditorState, SourcPlugin } from "./plugin";
+import { pp } from "./tool/string";
+import { CorePlugin } from "./core";
 
 enum Modifiers {
   NONE = 1 << 0,

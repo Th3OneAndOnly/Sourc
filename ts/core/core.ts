@@ -7,9 +7,9 @@ import {
   SourcPlugin,
   PluginConfig,
 } from "./plugin";
-import { CORE_LOGGER } from "./private-loggers.js";
-import { CaretSelection, getKeyType, KeyType, isCaretFlat } from "./tool/dom-tools.js";
-import { findLineOffset, pp } from "./tool/string.js";
+import { CORE_LOGGER } from "./private-loggers";
+import { CaretSelection, getKeyType, KeyType, isCaretFlat } from "./tool/dom-tools";
+import { findLineOffset, pp } from "./tool/string";
 
 const SpecialKeys = Object.freeze(
   new Map(

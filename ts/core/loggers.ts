@@ -1,14 +1,14 @@
-import { LoggerPool } from "./logger.js";
+import { LoggerPool } from './logger';
 import {
   DOM_TOOLS_LOGGER,
   PLUGIN_LOGGER,
-  CORE_LOGGER,
-} from "./private-loggers.js";
+  CORE_LOGGER
+} from './private-loggers';
 
 const loggers = Object.freeze({
   DOMTOOLS: DOM_TOOLS_LOGGER,
   PLUGIN: PLUGIN_LOGGER,
-  CORE: CORE_LOGGER,
+  CORE: CORE_LOGGER
 } as const);
 
 export const UTIL_LOGGERS_POOL = new LoggerPool(loggers);

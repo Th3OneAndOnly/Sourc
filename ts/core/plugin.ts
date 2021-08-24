@@ -1,6 +1,6 @@
-import { PLUGIN_LOGGER } from "./private-loggers.js";
-import { CaretSelection } from "./tool/dom-tools.js";
-import { pp } from "./tool/string.js";
+import { PLUGIN_LOGGER } from './private-loggers';
+import { CaretSelection } from './tool/dom-tools';
+import { pp } from './tool/string';
 
 export class EditorState {
   constructor(
