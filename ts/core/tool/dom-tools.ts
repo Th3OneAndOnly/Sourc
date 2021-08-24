@@ -3,6 +3,10 @@ import { assert } from "./assert.js";
 
 export type CaretSelection = { start: number; end: number };
 
+export function isCaretFlat(caret: CaretSelection): boolean {
+  return caret.start == caret.end;
+}
+
 export enum KeyType {
   Backspace,
   Delete,
@@ -30,23 +34,6 @@ export function getKeyType(key: string): KeyType {
     default:
       return KeyType.Alphanumeric;
   }
-}
-
-export function htmlToString(html: string): string {
-  let output = "";
-  let inTagName = false;
-  let currentTag = "";
-  for (let char of html) {
-    if (!inTagName) {
-      if (char == "<") {
-        inTagName = true;
-        currentTag = "";
-        continue;
-      }
-      output += char;
-    }
-  }
-  return output;
 }
 
 export function setSelection(element: HTMLElement, selection: CaretSelection) {
@@ -157,5 +144,5 @@ function getNodeTextLength(node: Node): number {
 }
 
 function getNodeOffset(node: Node): number {
-  return node == null ? -1 : 1 + getNodeOffset(node.previousSibling as Node);
+  return node == null ? -1 : 1 + getNodeOffset(<Node>node.previousSibling);
 }

@@ -1,5 +1,3 @@
-import { Action } from "./action.js";
-import { BlankAction, DeleteText, InsertText, MoveCaret } from "./actions.js";
 import { Logger, ConsoleLogStrategy } from "./logger.js";
 import { stringToHTML } from "./tool/conversion.js";
 import {
@@ -9,7 +7,6 @@ import {
 } from "./tool/dom-tools.js";
 import { clamp, partial } from "./tool/general.js";
 import { assertWithLogger } from "./tool/assert.js";
-import { isCaretFlat } from "./tool/text-tools.js";
 import { EditorState, SourcPlugin } from "./plugin.js";
 import { pp } from "./tool/string.js";
 import { CorePlugin } from "./core.js";

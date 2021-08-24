@@ -1,5 +1,3 @@
-import { CaretSelection } from "./dom-tools.js";
-
 export enum DifferenceType {
   ADDITION,
   DELETION,
@@ -10,10 +8,6 @@ export type TextDifference = {
   content: string;
   delta: number;
 };
-
-export function isCaretFlat(caret: CaretSelection): boolean {
-  return caret.start == caret.end;
-}
 
 export function findDifferences(
   original: string,

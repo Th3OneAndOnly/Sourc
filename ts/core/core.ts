@@ -8,9 +8,8 @@ import {
   PluginConfig,
 } from "./plugin";
 import { CORE_LOGGER } from "./private-loggers.js";
-import { CaretSelection, getKeyType, KeyType } from "./tool/dom-tools.js";
+import { CaretSelection, getKeyType, KeyType, isCaretFlat } from "./tool/dom-tools.js";
 import { findLineOffset, pp } from "./tool/string.js";
-import { isCaretFlat } from "./tool/text-tools.js";
 
 const SpecialKeys = Object.freeze(
   new Map(
