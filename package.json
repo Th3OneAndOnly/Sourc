@@ -4,7 +4,8 @@
   "description": "Lightweight modern online code editor",
   "main": "js/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "doc": "npx typedoc",
+    "build": "npx tsc"
   },
   "keywords": [
     "editor",
@@ -17,5 +18,9 @@
     "url": "https://github.com/Th3OneAndOnly/Sourc"
   },
   "author": "TheOneAndOnly",
-  "license": "ISC"
+  "license": "MIT",
+  "devDependencies": {
+    "typedoc": "^0.21.8",
+    "typescript": "^4.4.2"
+  }
 }

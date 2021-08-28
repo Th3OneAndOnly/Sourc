@@ -8,8 +8,9 @@ Please note we have a code of conduct, please follow it in all your interactions
 ## Pull Request Process
 
 1. Update the README with changes made, including new dependencies, features, or fixes.
-2. Increase the version numbers in any examples files and the README.md to the new version that this
-   Pull Request would represent. The versioning scheme we use is [SemVer](http://semver.org/).
+2. Increase the version numbers if needed in any examples files, the README.md, and the
+   package.json to the new version that this Pull Request would represent. The versioning
+   scheme we use is [SemVer](http://semver.org/).
 
 ## Code of Conduct
 
@@ -68,7 +69,7 @@ further defined and clarified by project maintainers.
 ### Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at [INSERT EMAIL ADDRESS]. All
+reported by contacting me at 209theoneandonly@gmail.com. All
 complaints will be reviewed and investigated and will result in a response that
 is deemed necessary and appropriate to the circumstances. The project team is
 obligated to maintain confidentiality with regard to the reporter of an incident.

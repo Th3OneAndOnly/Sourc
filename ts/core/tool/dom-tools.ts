@@ -1,20 +1,68 @@
-import { DOM_TOOLS_LOGGER } from "../private-loggers";
-import { assert } from "./assert";
+import { assert } from './assert';
+import { clamp } from './general';
+import { DOM_TOOLS_LOGGER } from '../private-loggers';
 
+/**
+ * A type representing a caret selection. `start` == `end` when the caret is flat (a line, not a box).
+ */
 export type CaretSelection = { start: number; end: number };
 
+/**
+ * Determines whether a {@link CaretSelection caret selection} is flat
+ * @param caret
+ * @returns true if caret is flat
+ */
 export function isCaretFlat(caret: CaretSelection): boolean {
   return caret.start == caret.end;
 }
 
+/**
+ * Clamps selection to a range of numbers
+ * @param selection - selection to clamp
+ * @param min - minimum number to clamp to
+ * @param max - maximum number to clamp to
+ * @returns clamped selection
+ */
+export function clampSelection(
+  selection: CaretSelection,
+  min: number,
+  max: number
+): CaretSelection {
+  return {
+    start: clamp(min, max, selection.start),
+    end: clamp(min, max, selection.end),
+  };
+}
+
+/**
+ * The type of a key pressed, kind of like a categorization.
+ */
 export enum KeyType {
+  /**
+   * Key is the backspace key
+   */
   Backspace,
+  /**
+   * Key is the delete key
+   */
   Delete,
+  /**
+   * Key is an arrow key
+   */
   ArrowKey,
+  /**
+   * Key is some sort of modifier key
+   */
   Modifier,
+  /**
+   * Key is any other key
+   */
   Alphanumeric,
 }
 
+/**
+ * Gets key type heralding to a key given by a {@link KeyEvent}'s key.
+ */
 export function getKeyType(key: string): KeyType {
   switch (key) {
     case "Backspace":
@@ -36,6 +84,9 @@ export function getKeyType(key: string): KeyType {
   }
 }
 
+/**
+ * Sets the caret selection on an element.
+ */
 export function setSelection(element: HTMLElement, selection: CaretSelection) {
   let sel = window.getSelection();
   if (sel == null) return;
@@ -91,6 +142,10 @@ function findOffsetIntoNode(
   }
 }
 
+/**
+ * Retrieves the cursor position as a {@link CaretSelection} from an element.
+ * @returns null if `element` is not being selected at the moment.
+ */
 export function getCaretSelection(
   element: (Node & ParentNode) | null
 ): CaretSelection | null {

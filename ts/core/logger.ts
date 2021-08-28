@@ -1,15 +1,25 @@
-import { assert } from './tool/assert';
+/**
+ * Tools for logger utilities in Sourc..
+ * @module
+ */
+
+import { assert } from "./tool/assert";
 
 class LoggingError extends Error {}
 
+/**
+ * Represents a bit field a {@link Logger} uses to determine if it should log a message or not.
+ * You likely won't use this very much unless you're writing your own {@link LogHandler}.
+ */
 export enum LogLevel {
   TRACE = 1 << 0,
   DEBUG = 1 << 1,
   INFO = 1 << 2,
   WARN = 1 << 3,
   ERROR = 1 << 4,
-  FATAL = 1 << 5
+  FATAL = 1 << 5,
 }
+
 const LogLevelALL =
   LogLevel.TRACE |
   LogLevel.DEBUG |
@@ -18,18 +28,38 @@ const LogLevelALL =
   LogLevel.ERROR |
   LogLevel.FATAL;
 
-export type LogStrategy = (
+/**
+ * Function type used in a {@link Logger} to handle what happens when a message is logged.
+ * @param level - the {@link LogLevel} of the message.
+ * @param name - the name of the logger used to log the message.
+ * @param message - the actual message.
+ */
+export type LogHandler = (
   level: LogLevel,
   name: string,
   message: string
 ) => void;
 
+/**
+ * Utility class to help with collecting and monitoring logs in your Sourc applications.
+ * Creating one is easy:
+ * ```typescript
+ * let my_logger = new Logger().withName("Your name here").withStrategy(() => {});
+ * ```
+ * You can now use it like so:
+ * ```typescript
+ * my_logger.ERROR("Your message here");
+ * ```
+ * Or of course any variant of TRACE, DEBUG, INFO, WARN, ERROR, or FATAL.
+ * You won't see anything happen though, until you register a {@link LogHandler}.
+ * A default one we ship is the {@link ConsoleLogStrategy}, that logs messages to the web console with colors.
+ */
 export class Logger {
-  private name: string = '';
+  private name: string = "";
 
   private logLevels: LogLevel = LogLevelALL;
 
-  private logStrategy: LogStrategy | null = null;
+  private logStrategy: LogHandler | null = null;
 
   public enabled: boolean = true;
 
@@ -43,14 +73,14 @@ export class Logger {
 
   private logMessage(level: LogLevel, message: string) {
     if (this.logStrategy == null) {
-      throw new LoggingError('No LogStrategy registered!');
+      throw new LoggingError("No LogStrategy registered!");
     }
     if (this.enabled && this.logLevels & level) {
       this.logStrategy(level, this.name, message);
     }
   }
 
-  public registerLoggingStrategy(strategy: LogStrategy) {
+  public registerLoggingStrategy(strategy: LogHandler) {
     this.logStrategy = strategy;
   }
 
@@ -118,8 +148,13 @@ export class Logger {
     this.logMessage(LogLevel.TRACE, msg);
   }
 
+  /**
+   * Traces the value and returns it back.
+   * @param obj - The object to trace
+   * @param [name] - If you want, you can associate a name with the object.
+   */
   public TRACK<T>(obj: T, name?: string): T {
-    this.logMessage(LogLevel.TRACE, `${name ? name + ': ' : ''}${obj}`);
+    this.logMessage(LogLevel.TRACE, `${name ? name + ": " : ""}${obj}`);
     return obj;
   }
 
@@ -143,6 +178,10 @@ export class Logger {
     this.logMessage(LogLevel.FATAL, msg);
   }
 
+  /**
+   * Configures this logger to be a copy of another.
+   * @param other - Other logger to copy.
+   */
   public configured(other: this): this {
     this.enabled = other.enabled;
     this.logLevels = other.logLevels;
@@ -150,7 +189,7 @@ export class Logger {
     return this;
   }
 
-  public withStrategy(strategy: LogStrategy): this {
+  public withStrategy(strategy: LogHandler): this {
     this.registerLoggingStrategy(strategy);
     return this;
   }
@@ -161,14 +200,19 @@ export class Logger {
   }
 }
 
-export const ConsoleLogStrategy: LogStrategy = (level, name, message) => {
+/**
+ * Standard log strategy that is used by default in all of Sourc's loggers.
+ * When it receives a log message, it prints to the web console in the format: `[NAME] LEVEL: MSG`.
+ * It also colors the output depending on the log level.
+ */
+export const ConsoleLogStrategy: LogHandler = (level, name, message) => {
   const LogLevelToCss = {
-    [LogLevel.TRACE]: 'color: hsl(0, 0%, 35%);',
-    [LogLevel.DEBUG]: 'color: hsl(0, 0%, 45%);',
-    [LogLevel.INFO]: 'color: white;',
-    [LogLevel.WARN]: 'color: orange;',
-    [LogLevel.ERROR]: 'color: hsl(15, 90%, 65%);',
-    [LogLevel.FATAL]: 'color: red; font-weight: bold;'
+    [LogLevel.TRACE]: "color: hsl(0, 0%, 35%);",
+    [LogLevel.DEBUG]: "color: hsl(0, 0%, 45%);",
+    [LogLevel.INFO]: "color: white;",
+    [LogLevel.WARN]: "color: orange;",
+    [LogLevel.ERROR]: "color: hsl(15, 90%, 65%);",
+    [LogLevel.FATAL]: "color: red; font-weight: bold;",
   };
   console.log(
     `%c[${name}] ${LogLevel[level]}: ${message}`,
@@ -176,10 +220,18 @@ export const ConsoleLogStrategy: LogStrategy = (level, name, message) => {
   );
 };
 
+/**
+ * A collection of loggers tied to string keys that allow for bulk configuration of loggers.
+ * @template T - A type representation of the string to loggers map-object, allowing for precise typing for the collection.
+ */
 export class LoggerPool<T extends { [s: string]: Logger }> {
   constructor(private loggers: T) {}
 
-  public registerLoggingStrategy(strategy: LogStrategy) {
+  /**
+   * Registers logging strategy for every logger
+   * @param strategy - the strategy to register.
+   */
+  public registerLoggingStrategy(strategy: LogHandler) {
     for (let logger of Object.values(this.loggers)) {
       logger.registerLoggingStrategy(strategy);
     }
@@ -269,16 +321,24 @@ export class LoggerPool<T extends { [s: string]: Logger }> {
     return this;
   }
 
+  /**
+   * Enables a specific logger
+   * @param loggerName - the name of the logger to enable. If you instantiate this class with a `const` object, this property will be typed to the keys of your object.
+   */
   public enableLogger(loggerName: keyof T): this {
     const logger = this.loggers[loggerName];
-    assert(logger != null, 'Name is not a valid logger!');
+    assert(logger != null, "Name is not a valid logger!");
     logger.enabled = true;
     return this;
   }
 
+  /**
+   * Disables a specific logger
+   * @param loggerName - the name of the logger to disable. If you instantiate this class with a `const` object, this property will be typed to the keys of your object.
+   */
   public disableLogger(loggerName: keyof T): this {
     const logger = this.loggers[loggerName];
-    assert(logger != null, 'Name is not a valid logger!');
+    assert(logger != null, "Name is not a valid logger!");
     logger.enabled = false;
     return this;
   }
@@ -298,5 +358,8 @@ export class LoggerPool<T extends { [s: string]: Logger }> {
   }
 }
 
-export const CLIENT_LOGGER = new Logger().withName('CLIENT_SOURC_APP');
+/**
+ * The default client logger you should use in your applications. It comes pre-configured with a name and logging strategy.
+ */
+export const CLIENT_LOGGER = new Logger().withName("CLIENT_SOURC_APP");
 CLIENT_LOGGER.registerLoggingStrategy(ConsoleLogStrategy);

@@ -5,3 +5,4 @@ export * from "./core/loggers.js";
 
 export * from "./core/tool/assert.js";
 export * from "./core/tool/string.js";
+export * from "./core/tool/dom-tools.js";

@@ -1,15 +1,16 @@
-import { Logger, ConsoleLogStrategy } from "./logger";
-import { stringToHTML } from "./tool/conversion";
+import { assertWithLogger } from './tool/assert';
+import { clamp, partial } from './tool/general';
+import { ConsoleLogStrategy, Logger } from './logger';
+import { CorePlugin } from './core';
+import { EditorState, SourcPlugin } from './plugin';
+import { pp } from './tool/string';
+import { stringToHTML } from './tool/conversion';
 import {
   CaretSelection,
+  clampSelection,
   getCaretSelection,
   setSelection,
 } from "./tool/dom-tools";
-import { clamp, partial } from "./tool/general";
-import { assertWithLogger } from "./tool/assert";
-import { EditorState, SourcPlugin } from "./plugin";
-import { pp } from "./tool/string";
-import { CorePlugin } from "./core";
 
 enum Modifiers {
   NONE = 1 << 0,
@@ -32,36 +33,65 @@ type KeyState = { mods: Modifiers };
 
 type EditorContent = { current: string; previous: string };
 
+/**
+ * The heart and soul of Sourc. The TextEditor class
+ * is the gateway into your application. Begin by creating one,
+ * making sure to have any sort of HTMLElement ready:
+ * ```typescript
+ * let editor = new TextEditor(element);
+ * ```
+ * You can access the {@link TextEditor.LOGGER} to enable or
+ * disable anything you want there now.
+ *
+ * Next add any plugins you want to it (the core one is already loaded):
+ * ```typescript
+ * editor.registerPlugin(myPlugin);
+ * ```
+ * See {@link SourcPlugin} for more info on creating plugins.
+ *
+ * Now initialize the editor:
+ * ```typescript
+ * editor.initialize();
+ * ```
+ * The element will become content-editable, and becomes a Sourc editor!
+ */
 export class TextEditor {
   private plugins: SourcPlugin[] = [];
   private keyState: KeyState = { mods: Modifiers.NONE };
   private content: EditorContent = { current: "", previous: "" };
 
-  private name: string = "Sourc Editor <unknown>";
+  /**
+   * Publicly accessible logger for the text editor.
+   * See {@link Logger}
+   */
   public LOGGER: Logger = new Logger()
-    .withName(this.name)
+    .withName("Sourc Editor <unknown>")
     .withStrategy(ConsoleLogStrategy)
     .disableTrace()
     .disableDebug();
 
   private assert = partial(assertWithLogger, this.LOGGER);
 
-  constructor(
-    private readonly editor: HTMLDivElement,
-    private readonly overlay?: HTMLDivElement
-  ) {}
+  /**
+   * Creates an instance of text editor.
+   * @param editor The element the editor will use to run.
+   */
+  constructor(private readonly editor: HTMLDivElement) {
+    this.registerPlugin(CorePlugin);
+  }
 
+  /**
+   * Initializes the editor and all registered plugins.
+   */
   public initialize() {
     this.editor.contentEditable = "false";
     this.initializeEditor();
     this.editor.contentEditable = "true";
   }
 
-  public setName(name: string) {
-    this.name = name;
-    this.LOGGER.withName(this.name);
-  }
-
+  /**
+   * Registers a plugin into the editor
+   */
   public registerPlugin(plugin: SourcPlugin) {
     this.plugins.push(plugin);
   }
@@ -97,10 +127,9 @@ export class TextEditor {
       this.clampSelection();
     });
 
-    this.registerPlugin(CorePlugin);
-
     this.LOGGER.INFO("Editor successfully initialized!");
   }
+
   private clampSelection() {
     const caretPos = getCaretSelection(this.editor);
     if (!caretPos || (this.editor.textContent?.length ?? 0) < 1) {
@@ -132,15 +161,4 @@ export class TextEditor {
     this.content.current = state.content;
     this.updateEditor(state.selection);
   }
-}
-
-function clampSelection(
-  selection: CaretSelection,
-  min: number,
-  max: number
-): CaretSelection {
-  return {
-    start: clamp(min, max, selection.start),
-    end: clamp(min, max, selection.end),
-  };
 }
