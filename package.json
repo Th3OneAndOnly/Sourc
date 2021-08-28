@@ -1,6 +1,6 @@
 {
   "name": "@the_one_and_only/sourc",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Lightweight modern online code editor",
   "main": "js/index.js",
   "scripts": {
@@ -12,6 +12,10 @@
     "web",
     "sourc"
   ],
+  "repository": {
+    "directory": ".",
+    "url": "https://github.com/Th3OneAndOnly/Sourc"
+  },
   "author": "TheOneAndOnly",
   "license": "ISC"
 }

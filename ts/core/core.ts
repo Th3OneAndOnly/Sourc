@@ -1,6 +1,3 @@
-import { Action } from "./action.js";
-import { BlankAction, DeleteText, InsertText, MoveCaret } from "./actions.js";
-import { Logger, ConsoleLogStrategy } from "./logger.js";
 import {
   PluginProvider,
   EditorState,
@@ -8,7 +5,7 @@ import {
   PluginConfig,
 } from "./plugin";
 import { CORE_LOGGER } from "./private-loggers";
-import { CaretSelection, getKeyType, KeyType, isCaretFlat } from "./tool/dom-tools";
+import { getKeyType, KeyType, isCaretFlat } from "./tool/dom-tools";
 import { findLineOffset, pp } from "./tool/string";
 
 const SpecialKeys = Object.freeze(
@@ -108,39 +105,6 @@ class CorePluginProvider extends PluginProvider {
       start: caret,
       end: caret,
     });
-  }
-
-  private getAction(key: string, location: CaretSelection): Action {
-    const arrows = Object.freeze(
-      // TODO: up/down arrow keys
-      new Map(
-        Object.entries({
-          ArrowLeft: new MoveCaret({
-            start: location.start - 1,
-            end: location.start - 1,
-          }),
-          ArrowRight: new MoveCaret({
-            start: location.start + 1,
-            end: location.start + 1,
-          }),
-        })
-      )
-    );
-    if (arrows.has(key)) return arrows.get(key)!;
-    if (isCaretFlat(location)) {
-      CORE_LOGGER.TRACE("Caret is flat!");
-      if (key == "Backspace") {
-        CORE_LOGGER.DEBUG("Deleting one character.");
-        return new DeleteText(location.start - 1, 1);
-      } else {
-        key = SpecialKeys.get(key) ?? key;
-        CORE_LOGGER.DEBUG(pp`Inserting one character: ${key}`);
-        let action = new InsertText(key, location.start);
-        return action;
-      }
-    }
-    CORE_LOGGER.INFO("getAction returned BlankAction.");
-    return new BlankAction();
   }
 }
 
