@@ -1,6 +1,6 @@
 import { CORE_LOGGER } from './private-loggers';
 import { findLineOffset, pp } from './tool/string';
-import { getKeyType, isCaretFlat, KeyType } from './tool/dom-tools';
+import { getKeyType, isSelectionFlat, KeyType } from './tool/dom-tools';
 import { StatefulFunction } from './tool/general';
 import {
   PluginProvider,
@@ -31,7 +31,7 @@ class CorePluginProvider extends PluginProvider {
       .require(!IgnoredKeys.includes(key))
       .runOne()
       .if(type == KeyType.ArrowKey, this.handleArrowKey.bind(this))
-      .if(isCaretFlat(state.selection!), this.handleFlatCaret.bind(this))
+      .if(isSelectionFlat(state.selection!), this.handleFlatCaret.bind(this))
       .try(key, state, type);
   }
 

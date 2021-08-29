@@ -12,8 +12,17 @@ export type CaretSelection = { start: number; end: number };
  * @param caret
  * @returns true if caret is flat
  */
-export function isCaretFlat(caret: CaretSelection): boolean {
+export function isSelectionFlat(caret: CaretSelection): boolean {
   return caret.start == caret.end;
+}
+
+export function normalizeSelection(caret: CaretSelection): CaretSelection {
+  if (caret.start > caret.end)
+    return {
+      start: caret.end,
+      end: caret.start,
+    };
+  else return caret;
 }
 
 /**
@@ -88,10 +97,12 @@ export function getKeyType(key: string): KeyType {
  * Sets the caret selection on an element.
  */
 export function setSelection(element: HTMLElement, selection: CaretSelection) {
+  selection = normalizeSelection(selection);
   let sel = window.getSelection();
   if (sel == null) return;
   let [range] = createRange(element, selection.start);
   range.collapse(false);
+  range.setEnd(range.endContainer, selection.end);
   sel.removeAllRanges();
   sel.addRange(range);
 }

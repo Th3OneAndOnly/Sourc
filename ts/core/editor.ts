@@ -122,15 +122,18 @@ export class TextEditor {
       }
     });
 
-    this.editor.addEventListener("click", (e) => {
-      e.preventDefault();
-      this.clampSelection();
-    });
-
+    this.tickLoop();
     this.LOGGER.INFO("Editor successfully initialized!");
   }
 
+  private tickLoop() {
+    // this.setState(new EditorState("Hello World!", { start: 5, end: 0 }));
+    this.clampSelection();
+    requestAnimationFrame(this.tickLoop.bind(this));
+  }
+
   private clampSelection() {
+    // TODO: fix backwards selection not working
     const caretPos = getCaretSelection(this.editor);
     if (!caretPos || (this.editor.textContent?.length ?? 0) < 1) {
       return;
