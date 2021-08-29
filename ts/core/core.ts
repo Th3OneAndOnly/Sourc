@@ -1,12 +1,13 @@
+import { CORE_LOGGER } from './private-loggers';
+import { findLineOffset, pp } from './tool/string';
+import { getKeyType, isCaretFlat, KeyType } from './tool/dom-tools';
+import { StatefulFunction } from './tool/general';
 import {
   PluginProvider,
   EditorState,
   SourcPlugin,
   PluginConfig,
 } from "./plugin";
-import { CORE_LOGGER } from "./private-loggers";
-import { getKeyType, KeyType, isCaretFlat } from "./tool/dom-tools";
-import { findLineOffset, pp } from "./tool/string";
 
 const SpecialKeys = Object.freeze(
   new Map(
@@ -20,36 +21,57 @@ const IgnoredKeys = Object.freeze(["Meta"]);
 
 class CorePluginProvider extends PluginProvider {
   override onKeyPressed(key: string, state: EditorState) {
-    if (!state.selection) {
-      CORE_LOGGER.ERROR("Key was pressed, but couldn't find the caret!");
-      return;
-    }
-    if (IgnoredKeys.includes(key)) return;
     key = SpecialKeys.get(key) ?? key;
-    let type = getKeyType(key);
-    if (type == KeyType.ArrowKey) {
-      this.handleArrowKey(key, state);
-      return;
-    }
-    if (isCaretFlat(state.selection)) {
-      const location = state.selection.start;
-      if (type == KeyType.Backspace) {
-        state.deleteText(location - 1, 1);
-        state.setSelection({
-          start: location - 1,
-          end: location - 1,
-        });
-      } else if (type == KeyType.Delete) {
-        if (location >= state.content.length) return;
-        state.deleteText(location, 1);
-      } else {
-        state.insertText(key, location);
-        state.setSelection({
-          start: location + 1,
-          end: location + 1,
-        });
-      }
-    }
+    const type = getKeyType(key);
+
+    new StatefulFunction<[string, EditorState, KeyType]>()
+      .require(state.selection != null, () =>
+        CORE_LOGGER.ERROR("Key was pressed, but couldn't find the caret!")
+      )
+      .require(!IgnoredKeys.includes(key))
+      .runOne()
+      .if(type == KeyType.ArrowKey, this.handleArrowKey.bind(this))
+      .if(isCaretFlat(state.selection!), this.handleFlatCaret.bind(this))
+      .try(key, state, type);
+  }
+
+  private handleFlatCaret(key: string, state: EditorState, type: KeyType) {
+    const location = state.selection!.start;
+    new StatefulFunction<[string, EditorState, number]>()
+      .runOne()
+      .if(type == KeyType.Backspace, this.handleFlatBackspace.bind(this))
+      .if(type == KeyType.Delete, this.handleFlatDelete.bind(this))
+      .if(true, this.handleFlatKeyInsert.bind(this))
+      .try(key, state, location);
+  }
+
+  private handleFlatKeyInsert(
+    key: string,
+    state: EditorState,
+    location: number
+  ) {
+    state.insertText(key, location);
+    state.setSelection({
+      start: location + 1,
+      end: location + 1,
+    });
+  }
+
+  private handleFlatDelete(_key: string, state: EditorState, location: number) {
+    if (location >= state.content.length) return;
+    state.deleteText(location, 1);
+  }
+
+  private handleFlatBackspace(
+    _key: string,
+    state: EditorState,
+    location: number
+  ) {
+    state.deleteText(location - 1, 1);
+    state.setSelection({
+      start: location - 1,
+      end: location - 1,
+    });
   }
 
   private handleArrowKey(key: string, state: EditorState) {

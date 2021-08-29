@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Documentation for every publicly accessible thing
 - findLineOf string utility function
+- StatefulFunction class for shortening and cleaning up long functions.
+
+  - StatefulFunction#runOne
+  - StatefulFunction#runAny
+  - StatefulFunction#if
+  - StatefulFunction#require
+  - StatefulFunction#try
+
+> Issues with StatefulFunction, (TODO):
+>
+> - You have to `.bind(this)` most of the time if you
+>   pass in a method, which is annoying.
 
 ### Removed
 
