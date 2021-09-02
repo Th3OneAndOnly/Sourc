@@ -47,6 +47,10 @@ Install Sourc with npm
 Take note that you will need a webpacker and some
 sort of dev server environment to run your webpage.
 
+## Documentation
+
+Coming soon! 👀
+
 ## Contributing
 
 Contributions are welcome and appreciated!
@@ -59,6 +63,7 @@ To get started, clone this repo:
 ```bash
 git clone https://github.com/Th3OneAndOnly/Sourc sourc-dev
 cd sourc-dev
+npm i
 ```
 
 Make another folder to test in, and link the npm:
@@ -70,7 +75,9 @@ cd test
 npm link sourc
 ```
 
-Next, hack away! Thank you so much for making a
+To build it, use `npm run build` 🏗️ and to build the docs use `npm run doc` 📖.
+
+Now, hack away! 🔨 Thank you so much for making a
 contribution, please make a pull request in the repo
 after checking your PR with `contributing.md`.
 
