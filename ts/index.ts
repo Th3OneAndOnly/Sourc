@@ -1,8 +1,8 @@
-export * from "./core/editor.js";
-export * from "./core/plugin.js";
-export * from "./core/logger.js";
-export * from "./core/loggers.js";
+export * from "./core/editor";
+export * from "./core/plugin";
+export * from "./core/logger";
+export * from "./core/loggers";
 
-export * from "./core/tool/assert.js";
-export * from "./core/tool/string.js";
-export * from "./core/tool/dom-tools.js";
+export * from "./core/tool/assert";
+export * from "./core/tool/string";
+export * from "./core/tool/dom-tools";
