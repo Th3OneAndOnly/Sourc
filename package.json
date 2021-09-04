@@ -1,5 +1,5 @@
 {
-  "name": "@the_one_and_only/sourc",
+  "name": "sourc-editor",
   "version": "0.0.1",
   "description": "Lightweight modern online code editor",
   "main": "js/index.js",
