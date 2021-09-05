@@ -3,8 +3,8 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 [![GitHub issues](https://img.shields.io/github/issues/Th3OneAndOnly/Sourc.svg)](https://GitHub.com/Th3OneAndOnly/Sourc/issues/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![NPM Version](https://img.shields.io/npm/v/@the_one_and_only/sourc)](https://www.npmjs.com/package/@the_one_and_only/sourc)
-[![NPM scoped bundle size](https://badgen.net/packagephobia/publish/@the_one_and_only/sourc)](https://www.npmjs.com/package/@the_one_and_only/sourc)
+[![NPM Version](https://img.shields.io/npm/v/sourc-editor)](https://www.npmjs.com/package/sourc-editor)
+[![NPM scoped bundle size](https://badgen.net/packagephobia/publish/sourc-editor)](https://www.npmjs.com/package/sourc-editor)
 
 ## [![saythanks](https://img.shields.io/badge/say-thanks-ff69b4.svg)](https://saythanks.io/to/Th3OneAndOnly)
 
