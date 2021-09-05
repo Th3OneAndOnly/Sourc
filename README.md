@@ -6,8 +6,7 @@
 [![NPM Version](https://img.shields.io/npm/v/@the_one_and_only/sourc)](https://www.npmjs.com/package/@the_one_and_only/sourc)
 [![NPM scoped bundle size](https://badgen.net/packagephobia/publish/@the_one_and_only/sourc)](https://www.npmjs.com/package/@the_one_and_only/sourc)
 
-[![saythanks](https://img.shields.io/badge/say-thanks-ff69b4.svg)](https://saythanks.io/to/Th3OneAndOnly)
----
+## [![saythanks](https://img.shields.io/badge/say-thanks-ff69b4.svg)](https://saythanks.io/to/Th3OneAndOnly)
 
 Sourc is a text editor for the web,
 ready to use in your projects.
@@ -40,7 +39,7 @@ See `CHANGLELOG.md` for up to date changes**
 Install Sourc with npm
 
 ```bash
-  npm install @the_one_and_only/sourc
+  npm install sourc-editor
   cd your-project
 ```
 
@@ -66,22 +65,23 @@ cd sourc-dev
 npm i
 ```
 
-Make another folder to test in, and link the npm:
+Now you can use `npm run init-lcl-demo-ts` to make a `demo` folder containing
+everything you need to kickstart local development. There's also an
+`init-lcl-demo-js` for a javascript demos as well.
+You can build each by running `npm run build-lcl-demo`!
 
-```bash
-npm link
-mkdir test
-cd test
-npm link sourc
-```
-
-To build it, use `npm run build` 🏗️ and to build the docs use `npm run doc` 📖.
+To build Sourc, use `npm run build` 🏗️ and to build the docs use `npm run doc` 📖.
 
 Now, hack away! 🔨 Thank you so much for making a
 contribution, please make a pull request in the repo
 after checking your PR with `contributing.md`.
 
 Please adhere to this project's `code of conduct`.
+
+## Testing
+
+`npm test` runs jest on the project. Coverage data is stored in the resulting `coverage`
+folder (not included in the repo).
 
 ## Support
 

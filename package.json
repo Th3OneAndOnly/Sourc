@@ -6,7 +6,10 @@
   "scripts": {
     "doc": "npx typedoc",
     "build": "npx tsc",
-    "test": "npx jest --coverage"
+    "test": "npx jest --coverage",
+    "init-lcl-demo-ts": "node init-lcl-demo-ts.js",
+    "init-lcl-demo-js": "node init-lcl-demo-js.js",
+    "build-lcl-demo": "node demo/build.js"
   },
   "keywords": [
     "editor",
