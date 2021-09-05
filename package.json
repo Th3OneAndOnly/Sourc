@@ -5,7 +5,8 @@
   "main": "js/index.js",
   "scripts": {
     "doc": "npx typedoc",
-    "build": "npx tsc"
+    "build": "npx tsc",
+    "test": "npx jest --coverage"
   },
   "keywords": [
     "editor",
@@ -20,6 +21,9 @@
   "author": "TheOneAndOnly",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "jest": "^27.1.0",
+    "ts-node": "^10.2.1",
     "typedoc": "^0.21.8",
     "typescript": "^4.4.2"
   }

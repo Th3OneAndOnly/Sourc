@@ -90,7 +90,7 @@ function valueToString(value: unknown, indentLevel: number): string {
  * hello
  * world
  * ```
- * The line offset of character 8 is 2, because it is 2 character forward from the line it is in.
+ * The line offset of character 8 is 2, because it is 2 characters forward from the line it is in.
  * @param string - String to search
  * @param index - Index of character in string
  * @returns line offset
