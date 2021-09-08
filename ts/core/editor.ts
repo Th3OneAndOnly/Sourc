@@ -9,7 +9,7 @@ import {
   CaretSelection,
   clampSelection,
   getCaretSelection,
-  setSelection,
+  setCaretSelection,
 } from "./tool/dom-tools";
 
 enum Modifiers {
@@ -139,7 +139,7 @@ export class TextEditor {
       return;
     }
     let newSelection = clampSelection(caretPos, 0, this.content.current.length);
-    setSelection(this.editor, newSelection);
+    setCaretSelection(this.editor, newSelection);
   }
 
   private updateEditor(caret: CaretSelection | null) {
@@ -147,7 +147,7 @@ export class TextEditor {
     this.editor.innerHTML = content;
     this.LOGGER.TRACE(pp`New innerHTML content: "${content}"`);
     if (caret)
-      setSelection(
+      setCaretSelection(
         this.editor,
         clampSelection(caret, 0, this.content.current.length)
       );

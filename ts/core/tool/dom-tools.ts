@@ -1,6 +1,7 @@
 import { assert } from './assert';
 import { clamp } from './general';
 import { DOM_TOOLS_LOGGER } from '../private-loggers';
+import { pp } from './string';
 
 /**
  * A type representing a caret selection. `start` == `end` when the caret is flat (a line, not a box).
@@ -66,7 +67,7 @@ export enum KeyType {
   /**
    * Key is any other key
    */
-  Alphanumeric,
+  Other,
 }
 
 /**
@@ -89,56 +90,59 @@ export function getKeyType(key: string): KeyType {
     case "Super":
       return KeyType.Modifier;
     default:
-      return KeyType.Alphanumeric;
+      return KeyType.Other;
   }
 }
 
 /**
  * Sets the caret selection on an element.
  */
-export function setSelection(element: HTMLElement, selection: CaretSelection) {
+export function setCaretSelection(
+  element: HTMLElement,
+  selection: CaretSelection
+) {
   selection = normalizeSelection(selection);
+
   let sel = window.getSelection();
+  /* istanbul ignore next */
   if (sel == null) return;
-  let [range] = createRange(element, selection.start);
+
+  let range = createRange(element, selection.start);
+  let [endContainer, endOffset] = findOffsetIntoNode(element, selection.end);
+  assert(DOM_TOOLS_LOGGER, endContainer != null, "End offset too large!");
+
   range.collapse(false);
-  range.setEnd(range.endContainer, selection.end);
+  range.setEnd(endContainer, endOffset);
   sel.removeAllRanges();
   sel.addRange(range);
 }
 
-function createRange(
-  node: Node,
-  offset: number,
-  range?: Range
-): [Range, number] {
-  if (!range) {
-    range = document.createRange();
-    range.selectNode(node);
-    range.setStart(node, 0);
-  }
+function createRange(node: Node, offset: number): Range {
+  const range = document.createRange();
+  range.selectNode(node);
+  range.setStart(node, 0);
 
   const [child, front] = findOffsetIntoNode(
     node,
-    DOM_TOOLS_LOGGER.TRACK(offset, "offset")
+    DOM_TOOLS_LOGGER.TRACK(offset, "offsetIntoNode")
   );
   assert(DOM_TOOLS_LOGGER, child != null, "Child was null!");
   range.setEnd(child, front);
 
-  return [range, offset];
+  return range;
 }
 
 function findOffsetIntoNode(
   parent: Node,
   offset: number
 ): [Node | null, number] {
-  if (parent.nodeType == Node.TEXT_NODE || parent.nodeName == "BR") {
-    let content = parent.nodeName == "BR" ? "\n" : parent.textContent ?? "";
+  if (parent.nodeType == Node.TEXT_NODE) {
+    let content = parent.textContent!;
     if (content.length < offset) {
       offset -= content.length;
       return [null, offset];
     } else {
-      return [parent, parent.nodeName == "BR" ? offset - 1 : offset];
+      return [parent, offset];
     }
   } else {
     for (let i = 0; i < parent.childNodes.length; i++) {
@@ -149,6 +153,7 @@ function findOffsetIntoNode(
         return [node, newOffset];
       }
     }
+    /* istanbul ignore next */
     return [null, offset];
   }
 }
@@ -158,11 +163,12 @@ function findOffsetIntoNode(
  * @returns null if `element` is not being selected at the moment.
  */
 export function getCaretSelection(
-  element: (Node & ParentNode) | null
+  element: Node & ParentNode
 ): CaretSelection | null {
   let selection = window.getSelection();
 
-  if (element && selection && selection.rangeCount > 0) {
+  /* istanbul ignore else */
+  if (selection && selection.rangeCount > 0) {
     let range = selection.getRangeAt(0);
 
     return {
@@ -170,6 +176,8 @@ export function getCaretSelection(
       end: getTextLength(element, range.endContainer, range.endOffset),
     };
   }
+
+  /* istanbul ignore next */
   return null;
 }
 
@@ -198,11 +206,9 @@ function getTextLength(
 function getNodeTextLength(node: Node): number {
   let output = 0;
 
-  if (node.nodeName == "BR") {
-    output += 1;
-  } else if (node.nodeType == Node.TEXT_NODE) {
-    output += (node.nodeValue ?? "").length;
-  } else if (node.childNodes != null) {
+  if (node.nodeType == Node.TEXT_NODE) {
+    output += node.nodeValue!.length;
+  } else {
     node.childNodes.forEach((child) => (output += getNodeTextLength(child)));
   }
 

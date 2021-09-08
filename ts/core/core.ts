@@ -1,7 +1,7 @@
 import { CORE_LOGGER } from './private-loggers';
 import { findLineOffset, pp } from './tool/string';
+import { FunctionDispatcher } from './tool/general';
 import { getKeyType, isSelectionFlat, KeyType } from './tool/dom-tools';
-import { StatefulFunction } from './tool/general';
 import {
   PluginProvider,
   EditorState,
@@ -24,7 +24,7 @@ class CorePluginProvider extends PluginProvider {
     key = SpecialKeys.get(key) ?? key;
     const type = getKeyType(key);
 
-    new StatefulFunction<[string, EditorState, KeyType]>()
+    new FunctionDispatcher<[string, EditorState, KeyType]>()
       .require(state.selection != null, () =>
         CORE_LOGGER.ERROR("Key was pressed, but couldn't find the caret!")
       )
@@ -37,7 +37,7 @@ class CorePluginProvider extends PluginProvider {
 
   private handleFlatCaret(key: string, state: EditorState, type: KeyType) {
     const location = state.selection!.start;
-    new StatefulFunction<[string, EditorState, number]>()
+    new FunctionDispatcher<[string, EditorState, number]>()
       .runOne()
       .if(type == KeyType.Backspace, this.handleFlatBackspace.bind(this))
       .if(type == KeyType.Delete, this.handleFlatDelete.bind(this))

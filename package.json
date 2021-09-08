@@ -1,6 +1,6 @@
 {
   "name": "sourc-editor",
-  "version": "0.0.1",
+  "version": "0.0.1a",
   "description": "Lightweight modern online code editor",
   "main": "js/index.js",
   "scripts": {

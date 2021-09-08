@@ -19,7 +19,7 @@ export function clamp(min: number, max: number, num: number): number {
 
 // new ComposableFunction().runOne().if(cond, func).if(cond, func).withArgs().try();
 
-export class StatefulFunction<Params extends unknown[]> {
+export class FunctionDispatcher<Params extends unknown[]> {
   private isRunningOne = false;
   private isValid = true;
   private runFunctions: ((...args: Params) => unknown)[] = [];

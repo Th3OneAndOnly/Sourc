@@ -2,6 +2,7 @@
 // STRING FORMAT //
 ///////////////////
 
+/* istanbul ignore next */
 /**
  * Pretty-print. Takes a template string and returns a formatted string.
  * Usage:
@@ -19,15 +20,18 @@ export function pp(strings: TemplateStringsArray, ...objs: unknown[]) {
   }, "");
 }
 
+/* istanbul ignore next */
 function unknownToString(obj: unknown): string {
   if (typeof obj === "object") return objectToString(obj);
   else return valueToString(obj, 0);
 }
 
+/* istanbul ignore next */
 function objectToString(obj: object | null): string {
   return "\n" + prettyObjectToString(obj, 0);
 }
 
+/* istanbul ignore next */
 function prettyObjectToString(obj: object | null, indentLevel: number): string {
   if (obj == null) return "null";
   let name = obj.constructor.name;
@@ -44,14 +48,17 @@ function prettyObjectToString(obj: object | null, indentLevel: number): string {
   return out;
 }
 
+/* istanbul ignore next */
 function getIndent(level: number): string {
   return `${" ".repeat(level)}`;
 }
 
+/* istanbul ignore next */
 function never(_param: never): never {
   throw new Error("Unreachable!");
 }
 
+/* istanbul ignore next */
 function valueToString(value: unknown, indentLevel: number): string {
   if (value == null) return "null";
   let type = typeof value;
