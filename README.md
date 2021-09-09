@@ -81,7 +81,7 @@ Please adhere to this project's `code of conduct`.
 ## Testing
 
 `npm test` runs jest on the project. Coverage data is stored in the resulting `coverage`
-folder (not included in the repo).
+folder.
 
 ## Support
 
