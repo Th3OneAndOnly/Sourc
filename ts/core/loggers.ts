@@ -1,4 +1,4 @@
-import { ConsoleLogStrategy, LoggerPool } from './logger';
+import { ConsoleLogStrategy as ConsoleLogHandler, LoggerPool } from './logger';
 import {
   DOM_TOOLS_LOGGER,
   PLUGIN_LOGGER,
@@ -16,4 +16,4 @@ const loggers = Object.freeze({
  */
 export const UTIL_LOGGERS_POOL = new LoggerPool(loggers);
 UTIL_LOGGERS_POOL.disableAll();
-UTIL_LOGGERS_POOL.registerLoggingStrategy(ConsoleLogStrategy);
+UTIL_LOGGERS_POOL.registerLoggingHandler(ConsoleLogHandler);

@@ -1,9 +1,8 @@
+import { assert } from './tool/assert';
 /**
- * Tools for logger utilities in Sourc..
+ * Tools for logger utilities in Sourc.
  * @module
  */
-
-import { assert } from "./tool/assert";
 
 class LoggingError extends Error {}
 
@@ -55,33 +54,34 @@ export type LogHandler = (
  * A default one we ship is the {@link ConsoleLogStrategy}, that logs messages to the web console with colors.
  */
 export class Logger {
-  private name: string = "";
+  private _name: string = "";
 
-  private logLevels: LogLevel = LogLevelALL;
+  private _logLevels: LogLevel = LogLevelALL;
 
-  private logStrategy: LogHandler | null = null;
+  private _logHandler: LogHandler | null = null;
 
   public enabled: boolean = true;
 
   private enableLevel(level: LogLevel) {
-    this.logLevels = this.logLevels | level;
+    this._logLevels = this._logLevels | level;
   }
 
   private disableLevel(level: LogLevel) {
-    this.logLevels = this.logLevels ^ level;
+    this._logLevels = this._logLevels ^ level;
   }
 
   private logMessage(level: LogLevel, message: string) {
-    if (this.logStrategy == null) {
-      throw new LoggingError("No LogStrategy registered!");
-    }
-    if (this.enabled && this.logLevels & level) {
-      this.logStrategy(level, this.name, message);
+    assert(
+      this._logHandler != null,
+      new LoggingError("No LogHandler registered!")
+    );
+    if (this.enabled && this._logLevels & level) {
+      this._logHandler(level, this._name, message);
     }
   }
 
-  public registerLoggingStrategy(strategy: LogHandler) {
-    this.logStrategy = strategy;
+  public registerLogHandler(strategy: LogHandler) {
+    this._logHandler = strategy;
   }
 
   public enableTrace(): this {
@@ -184,22 +184,23 @@ export class Logger {
    */
   public configured(other: this): this {
     this.enabled = other.enabled;
-    this.logLevels = other.logLevels;
-    this.logStrategy = other.logStrategy;
+    this._logLevels = other._logLevels;
+    this._logHandler = other._logHandler;
     return this;
   }
 
-  public withStrategy(strategy: LogHandler): this {
-    this.registerLoggingStrategy(strategy);
+  public withHandler(strategy: LogHandler): this {
+    this.registerLogHandler(strategy);
     return this;
   }
 
   public withName(name: string): this {
-    this.name = name;
+    this._name = name;
     return this;
   }
 }
 
+/* istanbul ignore next */
 /**
  * Standard log strategy that is used by default in all of Sourc's loggers.
  * When it receives a log message, it prints to the web console in the format: `[NAME] LEVEL: MSG`.
@@ -225,97 +226,97 @@ export const ConsoleLogStrategy: LogHandler = (level, name, message) => {
  * @template T - A type representation of the string to loggers map-object, allowing for precise typing for the collection.
  */
 export class LoggerPool<T extends { [s: string]: Logger }> {
-  constructor(private loggers: T) {}
+  constructor(private _loggers: T) {}
 
   /**
    * Registers logging strategy for every logger
    * @param strategy - the strategy to register.
    */
-  public registerLoggingStrategy(strategy: LogHandler) {
-    for (let logger of Object.values(this.loggers)) {
-      logger.registerLoggingStrategy(strategy);
+  public registerLoggingHandler(strategy: LogHandler) {
+    for (let logger of Object.values(this._loggers)) {
+      logger.registerLogHandler(strategy);
     }
   }
 
   public bulkEnableTrace(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.enableTrace();
     }
     return this;
   }
 
   public bulkDisableTrace(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.disableTrace();
     }
     return this;
   }
 
   public bulkEnableDebug(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.enableDebug();
     }
     return this;
   }
 
   public bulkDisableDebug(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.disableDebug();
     }
     return this;
   }
 
   public bulkEnableInfo(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.enableInfo();
     }
     return this;
   }
 
   public bulkDisableInfo(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.disableInfo();
     }
     return this;
   }
 
   public bulkEnableWarn(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.enableWarn();
     }
     return this;
   }
 
   public bulkDisableWarn(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.disableWarn();
     }
     return this;
   }
 
   public bulkEnableError(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.enableError();
     }
     return this;
   }
 
   public bulkDisableError(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.disableError();
     }
     return this;
   }
 
   public bulkEnableFatal(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.enableFatal();
     }
     return this;
   }
 
   public bulkDisableFatal(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.disableFatal();
     }
     return this;
@@ -326,7 +327,7 @@ export class LoggerPool<T extends { [s: string]: Logger }> {
    * @param loggerName - the name of the logger to enable. If you instantiate this class with a `const` object, this property will be typed to the keys of your object.
    */
   public enableLogger(loggerName: keyof T): this {
-    const logger = this.loggers[loggerName];
+    const logger = this._loggers[loggerName];
     assert(logger != null, "Name is not a valid logger!");
     logger.enabled = true;
     return this;
@@ -337,21 +338,21 @@ export class LoggerPool<T extends { [s: string]: Logger }> {
    * @param loggerName - the name of the logger to disable. If you instantiate this class with a `const` object, this property will be typed to the keys of your object.
    */
   public disableLogger(loggerName: keyof T): this {
-    const logger = this.loggers[loggerName];
+    const logger = this._loggers[loggerName];
     assert(logger != null, "Name is not a valid logger!");
     logger.enabled = false;
     return this;
   }
 
   public enableAll(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.enabled = true;
     }
     return this;
   }
 
   public disableAll(): this {
-    for (let logger of Object.values(this.loggers)) {
+    for (let logger of Object.values(this._loggers)) {
       logger.enabled = false;
     }
     return this;
@@ -362,4 +363,4 @@ export class LoggerPool<T extends { [s: string]: Logger }> {
  * The default client logger you should use in your applications. It comes pre-configured with a name and logging strategy.
  */
 export const CLIENT_LOGGER = new Logger().withName("CLIENT_SOURC_APP");
-CLIENT_LOGGER.registerLoggingStrategy(ConsoleLogStrategy);
+CLIENT_LOGGER.registerLogHandler(ConsoleLogStrategy);

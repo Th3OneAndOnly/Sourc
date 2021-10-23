@@ -1,6 +1,7 @@
 import { CaretSelection } from './tool/dom-tools';
 import { PLUGIN_LOGGER } from './private-loggers';
 import { pp } from './tool/string';
+import { StateChange } from './state';
 
 /**
  * Contains mutable state for the editor.
@@ -8,62 +9,21 @@ import { pp } from './tool/string';
  */
 export class EditorState {
   constructor(
-    private _content: string,
-    private _selection: CaretSelection | null
+    public readonly content: string,
+    public readonly selection: CaretSelection | null
   ) {}
 
-  public get content(): string {
-    return this._content;
-  }
-
-  public get selection(): CaretSelection | null {
-    return this._selection;
-  }
-
-  /**
-   * Inserts text at a specified position.
-   * Ex.:
-   * ```typescript
-   * state.content; // "Hello World!"
-   * state.insertText("Wonderful ", 6);
-   * state.content; // "Hello Wonderful World!"
-   * ```
-   */
-  public insertText(text: string, position: number) {
-    if (position < 0 || position > this._content.length) {
-      PLUGIN_LOGGER.ERROR(pp`Cannot insert text at position ${position}`);
-      return;
-    }
-    let old = this._content;
-    this._content = old.slice(0, position) + text + old.slice(position);
-  }
-
-  /**
-   * Deletes a length of text at a specified position.
-   * Ex.:
-   * ```typescript
-   * state.content; // "Hello World!"
-   * state.deleteText(6, 6);
-   * state.content; // "Hello!"
-   * ```
-   */
-  public deleteText(position: number, length: number) {
-    if (position < 0 || position > this._content.length) {
-      PLUGIN_LOGGER.ERROR(pp`Cannot delete text at position ${position}`);
-      return;
-    }
-
-    if (position + length < 0 || position + length > this._content.length) {
-      PLUGIN_LOGGER.ERROR(pp`Cannot delete text of length ${length}`);
-      return;
-    }
-
-    let old = this._content;
-    this._content = old.slice(0, position) + old.slice(position + length);
-  }
-
-  public setSelection(selection: CaretSelection) {
-    this._selection = selection;
+  public copyFrom({
+    content,
+    selection,
+  }: {
+    content?: string;
+    selection?: CaretSelection | null;
+  }): EditorState {
+    return new EditorState(
+      content ?? this.content,
+      selection ?? this.selection
+    );
   }
 }
 
@@ -90,12 +50,19 @@ export class EditorState {
  * Now you just create a new {@link Plugin} and register it, and you see the messages in the console!
  */
 export abstract class PluginProvider {
-  public onInitialize() {}
-  public onKeyPressed(key: string, state: EditorState) {}
+  public async onInitialize() {}
+  public async onKeyPressed(
+    key: string,
+    state: EditorState
+  ): Promise<StateChange[]> {
+    return [];
+  }
 }
 
+export type PluginSettings = {}; // For expansion
+
 export class PluginConfig {
-  constructor({}) {}
+  constructor({}: PluginSettings) {}
 }
 
 /**
@@ -105,7 +72,7 @@ export class PluginConfig {
  */
 export class SourcPlugin {
   constructor(
-    public readonly provider: PluginProvider,
+    public readonly providers: PluginProvider[],
     public readonly config: PluginConfig
   ) {}
 }

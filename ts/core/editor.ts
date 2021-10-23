@@ -3,7 +3,9 @@ import { clamp, partial } from './tool/general';
 import { ConsoleLogStrategy, Logger } from './logger';
 import { CorePlugin } from './core';
 import { EditorState, SourcPlugin } from './plugin';
+import { PluginConfig, PluginSettings } from '..';
 import { pp } from './tool/string';
+import { StateChange } from './state';
 import { stringToHTML } from './tool/conversion';
 import {
   CaretSelection,
@@ -56,9 +58,9 @@ type EditorContent = { current: string; previous: string };
  * The element will become content-editable, and becomes a Sourc editor!
  */
 export class TextEditor {
-  private plugins: SourcPlugin[] = [];
-  private keyState: KeyState = { mods: Modifiers.NONE };
-  private content: EditorContent = { current: "", previous: "" };
+  private _plugins: SourcPlugin[] = [];
+  private _keyState: KeyState = { mods: Modifiers.NONE };
+  private _content: EditorContent = { current: "", previous: "" };
 
   /**
    * Publicly accessible logger for the text editor.
@@ -66,7 +68,7 @@ export class TextEditor {
    */
   public LOGGER: Logger = new Logger()
     .withName("Sourc Editor <unknown>")
-    .withStrategy(ConsoleLogStrategy)
+    .withHandler(ConsoleLogStrategy)
     .disableTrace()
     .disableDebug();
 
@@ -76,8 +78,12 @@ export class TextEditor {
    * Creates an instance of text editor.
    * @param editor The element the editor will use to run.
    */
-  constructor(private readonly editor: HTMLDivElement) {
-    this.registerPlugin(CorePlugin);
+  constructor(
+    private readonly editor: HTMLDivElement,
+    config: PluginSettings = {}
+  ) {
+    const core = new SourcPlugin(CorePlugin, new PluginConfig(config));
+    this.registerPlugin(core);
   }
 
   /**
@@ -86,6 +92,11 @@ export class TextEditor {
   public initialize() {
     this.editor.contentEditable = "false";
     this.initializeEditor();
+
+    for (const plugin of this._plugins) {
+      plugin.providers.forEach((p) => p.onInitialize());
+    }
+
     this.editor.contentEditable = "true";
   }
 
@@ -93,37 +104,50 @@ export class TextEditor {
    * Registers a plugin into the editor
    */
   public registerPlugin(plugin: SourcPlugin) {
-    this.plugins.push(plugin);
+    this._plugins.push(plugin);
   }
 
   private initializeEditor() {
-    this.editor.addEventListener("keydown", (event) => {
-      event.preventDefault();
-      if (ModifierMap.has(event.key)) {
-        if (event.repeat) return;
-        this.keyState.mods |= ModifierMap.get(event.key)!;
-        this.LOGGER.DEBUG(pp`Mod key pressed: ${event.key}`);
-        this.LOGGER.TRACE(pp`this.keyState=${this.keyState}`);
-        return;
-      }
+    this.editor.addEventListener("keydown", this.handleKeyDown.bind(this));
 
-      let state = this.getState();
-      for (let plugin of this.plugins) {
-        plugin.provider.onKeyPressed(event.key, state);
-      }
-      this.setState(state);
-    });
-
-    this.editor.addEventListener("keyup", (event) => {
-      if (ModifierMap.has(event.key)) {
-        this.keyState.mods ^= ModifierMap.get(event.key)!;
-        this.LOGGER.TRACE(pp`this.keyState=${this.keyState}`);
-        return;
-      }
-    });
+    this.editor.addEventListener("keyup", this.handleKeyUp.bind(this));
 
     this.tickLoop();
     this.LOGGER.INFO("Editor successfully initialized!");
+  }
+
+  private handleKeyDown(event: KeyboardEvent) {
+    event.preventDefault();
+    if (ModifierMap.has(event.key)) {
+      if (event.repeat) return;
+      this._keyState.mods |= ModifierMap.get(event.key)!;
+      this.LOGGER.DEBUG(pp`Mod key pressed: ${event.key}`);
+      this.LOGGER.TRACE(pp`this.keyState=${this._keyState}`);
+      return;
+    }
+
+    const state = this.getState();
+
+    let allPresses: Promise<StateChange[]>[] = [];
+    for (let plugin of this._plugins) {
+      for (let provider of plugin.providers) {
+        allPresses.push(provider.onKeyPressed(event.key, state));
+      }
+    }
+    Promise.all(allPresses).then((states) => {
+      let resolvedStates = this.resolveStateChanges(states.flat());
+      for (const resolvedState of resolvedStates) {
+        this.setState(resolvedState.transformState(this.getState()));
+      }
+    });
+  }
+
+  private handleKeyUp(event: KeyboardEvent) {
+    if (ModifierMap.has(event.key)) {
+      this._keyState.mods ^= ModifierMap.get(event.key)!;
+      this.LOGGER.TRACE(pp`this.keyState=${this._keyState}`);
+      return;
+    }
   }
 
   private tickLoop() {
@@ -138,30 +162,46 @@ export class TextEditor {
     if (!caretPos || (this.editor.textContent?.length ?? 0) < 1) {
       return;
     }
-    let newSelection = clampSelection(caretPos, 0, this.content.current.length);
+    let newSelection = clampSelection(
+      caretPos,
+      0,
+      this._content.current.length
+    );
     setCaretSelection(this.editor, newSelection);
   }
 
   private updateEditor(caret: CaretSelection | null) {
-    const content = stringToHTML(this.content.current);
+    const content = stringToHTML(this._content.current);
     this.editor.innerHTML = content;
     this.LOGGER.TRACE(pp`New innerHTML content: "${content}"`);
     if (caret)
       setCaretSelection(
         this.editor,
-        clampSelection(caret, 0, this.content.current.length)
+        clampSelection(caret, 0, this._content.current.length)
       );
+  }
+
+  private resolveStateChanges(changes: StateChange[]): StateChange[] {
+    const out: StateChange[] = [];
+    for (const change of changes) {
+      let matched = false;
+      for (const existing of out) {
+        if (existing.isIdenticalTo(change)) matched = true;
+      }
+      if (!matched) out.push(change);
+    }
+    return out;
   }
 
   private getState(): EditorState {
     const selection = getCaretSelection(this.editor);
     if (!selection)
       this.LOGGER.WARN("Selection was null when attempting to get state.");
-    return new EditorState(this.content.current, selection);
+    return new EditorState(this._content.current, selection);
   }
 
   private setState(state: EditorState) {
-    this.content.current = state.content;
+    this._content.current = state.content;
     this.updateEditor(state.selection);
   }
 }

@@ -1,4 +1,10 @@
 import { CORE_LOGGER } from './private-loggers';
+import {
+  DeleteText,
+  InsertText,
+  SetSelection,
+  StateChange
+  } from './state';
 import { findLineOffset, pp } from './tool/string';
 import { FunctionDispatcher } from './tool/general';
 import { getKeyType, isSelectionFlat, KeyType } from './tool/dom-tools';
@@ -20,11 +26,17 @@ const SpecialKeys = Object.freeze(
 const IgnoredKeys = Object.freeze(["Meta"]);
 
 class CorePluginProvider extends PluginProvider {
-  override onKeyPressed(key: string, state: EditorState) {
+  override async onKeyPressed(
+    key: string,
+    state: EditorState
+  ): Promise<StateChange[]> {
     key = SpecialKeys.get(key) ?? key;
     const type = getKeyType(key);
 
-    new FunctionDispatcher<[string, EditorState, KeyType]>()
+    return new FunctionDispatcher<
+      [string, EditorState, KeyType],
+      StateChange[]
+    >()
       .require(state.selection != null, () =>
         CORE_LOGGER.ERROR("Key was pressed, but couldn't find the caret!")
       )
@@ -32,49 +44,60 @@ class CorePluginProvider extends PluginProvider {
       .runOne()
       .if(type == KeyType.ArrowKey, this.handleArrowKey.bind(this))
       .if(isSelectionFlat(state.selection!), this.handleFlatCaret.bind(this))
-      .try(key, state, type);
+      .try(key, state, type)
+      .flat();
   }
 
-  private handleFlatCaret(key: string, state: EditorState, type: KeyType) {
+  private handleFlatCaret(
+    key: string,
+    state: EditorState,
+    type: KeyType
+  ): StateChange[] {
     const location = state.selection!.start;
-    new FunctionDispatcher<[string, EditorState, number]>()
+    return new FunctionDispatcher<
+      [string, EditorState, number],
+      StateChange[]
+    >()
       .runOne()
       .if(type == KeyType.Backspace, this.handleFlatBackspace.bind(this))
       .if(type == KeyType.Delete, this.handleFlatDelete.bind(this))
       .if(true, this.handleFlatKeyInsert.bind(this))
-      .try(key, state, location);
+      .try(key, state, location)
+      .flat();
   }
 
   private handleFlatKeyInsert(
     key: string,
-    state: EditorState,
+    _state: EditorState,
     location: number
-  ) {
-    state.insertText(key, location);
-    state.setSelection({
-      start: location + 1,
-      end: location + 1,
-    });
+  ): StateChange[] {
+    return [
+      new InsertText(key, location),
+      new SetSelection({ start: location + 1, end: location + 1 }),
+    ];
   }
 
-  private handleFlatDelete(_key: string, state: EditorState, location: number) {
-    if (location >= state.content.length) return;
-    state.deleteText(location, 1);
+  private handleFlatDelete(
+    _key: string,
+    state: EditorState,
+    location: number
+  ): StateChange[] {
+    if (location >= state.content.length) return [];
+    return [new DeleteText(location, 1)];
   }
 
   private handleFlatBackspace(
     _key: string,
     state: EditorState,
     location: number
-  ) {
-    state.deleteText(location - 1, 1);
-    state.setSelection({
-      start: location - 1,
-      end: location - 1,
-    });
+  ): StateChange[] {
+    return [
+      new DeleteText(location - 1, 1),
+      new SetSelection({ start: location - 1, end: location - 1 }),
+    ];
   }
 
-  private handleArrowKey(key: string, state: EditorState) {
+  private handleArrowKey(key: string, state: EditorState): StateChange[] {
     let caret = 0;
     switch (key) {
       case "ArrowUp": {
@@ -123,14 +146,8 @@ class CorePluginProvider extends PluginProvider {
         caret = state.selection!.end + 1;
         break;
     }
-    state.setSelection({
-      start: caret,
-      end: caret,
-    });
+    return [new SetSelection({ start: caret, end: caret })];
   }
 }
 
-export const CorePlugin = new SourcPlugin(
-  new CorePluginProvider(),
-  new PluginConfig({})
-);
+export const CorePlugin = [new CorePluginProvider()];

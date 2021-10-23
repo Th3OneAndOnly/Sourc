@@ -19,10 +19,10 @@ export function clamp(min: number, max: number, num: number): number {
 
 // new ComposableFunction().runOne().if(cond, func).if(cond, func).withArgs().try();
 
-export class FunctionDispatcher<Params extends unknown[]> {
+export class FunctionDispatcher<Params extends unknown[], Return = unknown> {
   private isRunningOne = false;
   private isValid = true;
-  private runFunctions: ((...args: Params) => unknown)[] = [];
+  private runFunctions: ((...args: Params) => Return)[] = [];
 
   public runOne(): this {
     this.isRunningOne = true;
@@ -34,7 +34,7 @@ export class FunctionDispatcher<Params extends unknown[]> {
     return this;
   }
 
-  public if(cond: boolean, func: (...args: Params) => unknown): this {
+  public if(cond: boolean, func: (...args: Params) => Return): this {
     if (cond) this.runFunctions.push(func);
     return this;
   }
@@ -52,14 +52,16 @@ export class FunctionDispatcher<Params extends unknown[]> {
     return this;
   }
 
-  public try(...args: Params) {
-    if (!this.isValid) return;
+  public try(...args: Params): Return[] {
+    if (!this.isValid) return [];
+    const out = [];
     if (this.isRunningOne && this.runFunctions.length > 0) {
-      this.runFunctions[0](...args);
+      out.push(this.runFunctions[0](...args));
     } else {
       for (let func of this.runFunctions) {
-        func(...args);
+        out.push(func(...args));
       }
     }
+    return out;
   }
 }

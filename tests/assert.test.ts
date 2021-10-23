@@ -13,7 +13,7 @@ const TestLoggingStrategy: LogHandler = (level, name, message) => {
 
 const CUSTOM_LOGGER = new Logger()
   .withName("test logger")
-  .withStrategy(TestLoggingStrategy);
+  .withHandler(TestLoggingStrategy);
 
 describe(assert, () => {
   beforeEach(() => {
