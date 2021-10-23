@@ -1,17 +1,15 @@
 {
-    "compilerOptions": {
-        "noImplicitReturns": true,
-        "noImplicitAny": true,
-        "noImplicitThis": true,
-        "noImplicitOverride": true,
-        "strict": true,
-        "declaration": true,
-        "target": "ES5",
-        "lib": [
-            "DOM",
-            "ES2020"
-        ],
-        "module": "CommonJS",
-        "outDir": "js"
-    }
+  "compilerOptions": {
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitOverride": true,
+    "strict": true,
+    "declaration": true,
+    "target": "ES5",
+    "lib": ["DOM", "ES2020"],
+    "module": "CommonJS",
+    "outDir": "js"
+  },
+  "include": ["ts"]
 }
