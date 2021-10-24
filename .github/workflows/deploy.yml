@@ -1,0 +1,43 @@
+name: Build And Deploy Docs w/ Version
+on:
+  push:
+    branches: [ master ]
+    tags:
+      - '*'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.1
+        with:
+          persist-credentials: false
+
+      # Runs a single command using the runners shell
+      - name: Build npm project and docs
+        run: | 
+          npm install
+          npm run build
+          npm run doc
+    
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1.1.0
+        with:
+          # Optionally strip `v` prefix
+          strip_v: true
+      
+      - name: Deploy Version
+        uses: peaceiris/actions-gh-pages@v3.7.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          destination_dir: ${{ steps.tag.outputs.tag }}
+      
+      - name: Deploy redirect
+        uses: peaceiris/actions-gh-pages@v3.7.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./redirect
+          keep_files: true
