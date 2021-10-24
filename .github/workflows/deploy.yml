@@ -1,4 +1,4 @@
-name: Build And Deploy Docs w/ Version
+name: B&D w.o Version
 on:
   push:
     branches: [ master ]
