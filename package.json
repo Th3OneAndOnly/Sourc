@@ -3,15 +3,17 @@
   "version": "0.0.2",
   "description": "Lightweight modern online code editor",
   "main": "js/index.js",
-  "bugs": "https://github.com/Th3OneAndOnly/Sourc/issues",
+  "bugs": {
+    "url": "https://github.com/Th3OneAndOnly/Sourc/issues",
+    "email": "209th3oneandonly@gmail.com"
+  },
   "scripts": {
     "doc": "npx typedoc",
     "build": "npx tsc",
     "test": "npx jest --coverage",
     "dev-ts": "node dev-ts.js",
     "dev-js": "node dev-js.js",
-    "dev-build": "node demo/build.js",
-    "postversion": "git push && git push --tags"
+    "dev-build": "node demo/build.js"
   },
   "keywords": [
     "editor",
