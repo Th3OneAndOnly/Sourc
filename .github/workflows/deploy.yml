@@ -2,6 +2,8 @@ name: B&D w/ Version
 on:
   push:
     branches: [ master ]
+  tags:
+    - '*'
 
 jobs:
   build-and-deploy:
