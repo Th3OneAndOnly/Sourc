@@ -1,15 +1,17 @@
 {
   "name": "sourc-editor",
-  "version": "0.0.1a",
+  "version": "0.0.2",
   "description": "Lightweight modern online code editor",
   "main": "js/index.js",
+  "bugs": "https://github.com/Th3OneAndOnly/Sourc/issues",
   "scripts": {
     "doc": "npx typedoc",
     "build": "npx tsc",
     "test": "npx jest --coverage",
     "dev-ts": "node dev-ts.js",
     "dev-js": "node dev-js.js",
-    "dev-build": "node demo/build.js"
+    "dev-build": "node demo/build.js",
+    "postversion": "git push && git push --tags"
   },
   "keywords": [
     "editor",
