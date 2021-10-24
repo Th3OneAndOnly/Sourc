@@ -1,6 +1,6 @@
 import { assertWithLogger } from './tool/assert';
 import { clamp, partial } from './tool/general';
-import { ConsoleLogStrategy, Logger } from './logger';
+import { ConsoleLogHandler, Logger } from './logger';
 import { CorePlugin } from './core';
 import { EditorState, SourcPlugin } from './plugin';
 import { PluginConfig, PluginSettings } from '..';
@@ -68,7 +68,7 @@ export class TextEditor {
    */
   public LOGGER: Logger = new Logger()
     .withName("Sourc Editor <unknown>")
-    .withHandler(ConsoleLogStrategy)
+    .withHandler(ConsoleLogHandler)
     .disableTrace()
     .disableDebug();
 

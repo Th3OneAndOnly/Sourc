@@ -51,7 +51,7 @@ export type LogHandler = (
  * ```
  * Or of course any variant of TRACE, DEBUG, INFO, WARN, ERROR, or FATAL.
  * You won't see anything happen though, until you register a {@link LogHandler}.
- * A default one we ship is the {@link ConsoleLogStrategy}, that logs messages to the web console with colors.
+ * A default one we ship is the {@link ConsoleLogHandler}, that logs messages to the web console with colors.
  */
 export class Logger {
   private _name: string = "";
@@ -206,7 +206,7 @@ export class Logger {
  * When it receives a log message, it prints to the web console in the format: `[NAME] LEVEL: MSG`.
  * It also colors the output depending on the log level.
  */
-export const ConsoleLogStrategy: LogHandler = (level, name, message) => {
+export const ConsoleLogHandler: LogHandler = (level, name, message) => {
   const LogLevelToCss = {
     [LogLevel.TRACE]: "color: hsl(0, 0%, 35%);",
     [LogLevel.DEBUG]: "color: hsl(0, 0%, 45%);",
@@ -363,4 +363,4 @@ export class LoggerPool<T extends { [s: string]: Logger }> {
  * The default client logger you should use in your applications. It comes pre-configured with a name and logging strategy.
  */
 export const CLIENT_LOGGER = new Logger().withName("CLIENT_SOURC_APP");
-CLIENT_LOGGER.registerLogHandler(ConsoleLogStrategy);
+CLIENT_LOGGER.registerLogHandler(ConsoleLogHandler);

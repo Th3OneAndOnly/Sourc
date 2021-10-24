@@ -1,4 +1,5 @@
 {
   "entryPoints": ["./ts/index.ts"],
-  "out": "docs"
+  "out": "docs",
+  "githubPages" : "true"
 }

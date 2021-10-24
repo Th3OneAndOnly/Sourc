@@ -1,4 +1,4 @@
-import { ConsoleLogStrategy as ConsoleLogHandler, LoggerPool } from './logger';
+import { ConsoleLogHandler as ConsoleLogHandler, LoggerPool } from './logger';
 import {
   DOM_TOOLS_LOGGER,
   PLUGIN_LOGGER,
