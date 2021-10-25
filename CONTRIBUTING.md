@@ -5,6 +5,11 @@ email, or any other method with the owners of this repository before making a ch
 
 Please note we have a code of conduct, please follow it in all your interactions with the project.
 
+# Before you submit a PR
+
+Make sure your code passes all the tests. This is important to determine backwards compatibility.
+Write documentation if you can, _please_. And also update existing documentation to reflect your changes.
+
 ## Pull Request Process
 
 1. Update the README with changes made, including new dependencies, features, or fixes.

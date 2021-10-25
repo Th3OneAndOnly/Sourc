@@ -99,5 +99,3 @@ or create a Github Issue.
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-
-Special thanks to [readme.so](https://readme.so) for helping me make this README!
