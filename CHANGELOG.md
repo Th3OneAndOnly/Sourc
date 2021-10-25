@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+:spider_web:
+
+## [0.0.6] - 10/23/2021
+
+**_IMPORTANT: Version 0.0.2-0.0.5 omit any feature changes and should not be considered valid versions_**
+
 ### Added
 
 - Documentation for every publicly accessible thing

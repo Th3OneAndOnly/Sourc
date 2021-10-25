@@ -50,7 +50,13 @@ sort of dev server environment to run your webpage.
 
 ## Documentation
 
-Coming soon! 👀
+Documentation is available at [th3oneandonly.github.io/Sourc](https://th3oneandonly.github.io/Sourc). This will take you
+to the `latest` link, which is updated with each commit made
+to the github. To access documentation for other releases,
+replace `latest` with the version number, i.e. `0.0.6`.
+
+For now, I haven't figured out how to make the dynamic version
+dropdown, coming soon 👀.
 
 ## Contributing
 
