@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-:spider_web:
+<!-- >:spider_web: -->
+
+### Changed
+
+- `StatefulFunction` -> `FunctionDispatcher`
 
 ## [0.0.6] - 10/23/2021
 

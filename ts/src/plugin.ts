@@ -1,6 +1,4 @@
 import { CaretSelection } from './tool/dom-tools';
-import { PLUGIN_LOGGER } from './private-loggers';
-import { pp } from './tool/string';
 import { StateChange } from './state';
 
 /**
@@ -72,7 +70,7 @@ export class PluginConfig {
  */
 export class SourcPlugin {
   constructor(
-    public readonly providers: PluginProvider[],
+    public readonly provider: PluginProvider,
     public readonly config: PluginConfig
   ) {}
 }

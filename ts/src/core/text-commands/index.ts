@@ -1,19 +1,19 @@
-import { CORE_LOGGER } from './private-loggers';
+import { CORE_LOGGER } from '../../private-loggers';
 import {
   DeleteText,
   InsertText,
   SetSelection,
   StateChange
-  } from './state';
-import { findLineOffset, pp } from './tool/string';
-import { FunctionDispatcher } from './tool/general';
-import { getKeyType, isSelectionFlat, KeyType } from './tool/dom-tools';
+  } from '../../state';
+import { findLineOffset, pp } from '../../tool/string';
+import { FunctionDispatcher } from '../../tool/general';
+import { getKeyType, isSelectionFlat, KeyType } from '../../tool/dom-tools';
 import {
   PluginProvider,
   EditorState,
   SourcPlugin,
   PluginConfig,
-} from "./plugin";
+} from "../../plugin";
 
 const SpecialKeys = Object.freeze(
   new Map(
@@ -150,4 +150,4 @@ class CorePluginProvider extends PluginProvider {
   }
 }
 
-export const CorePlugin = [new CorePluginProvider()];
+export const CorePlugin = new CorePluginProvider();

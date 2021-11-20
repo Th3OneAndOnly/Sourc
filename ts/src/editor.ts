@@ -1,12 +1,16 @@
 import { assertWithLogger } from './tool/assert';
 import { clamp, partial } from './tool/general';
 import { ConsoleLogHandler, Logger } from './logger';
-import { CorePlugin } from './core';
-import { EditorState, SourcPlugin } from './plugin';
-import { PluginConfig, PluginSettings } from '..';
+import { CorePlugin } from './core/text-commands';
 import { pp } from './tool/string';
 import { StateChange } from './state';
 import { stringToHTML } from './tool/conversion';
+import {
+  EditorState,
+  SourcPlugin,
+  PluginConfig,
+  PluginSettings,
+} from "./plugin";
 import {
   CaretSelection,
   clampSelection,
@@ -94,7 +98,7 @@ export class TextEditor {
     this.initializeEditor();
 
     for (const plugin of this._plugins) {
-      plugin.providers.forEach((p) => p.onInitialize());
+      plugin.provider.onInitialize();
     }
 
     this.editor.contentEditable = "true";
@@ -130,9 +134,7 @@ export class TextEditor {
 
     let allPresses: Promise<StateChange[]>[] = [];
     for (let plugin of this._plugins) {
-      for (let provider of plugin.providers) {
-        allPresses.push(provider.onKeyPressed(event.key, state));
-      }
+      allPresses.push(plugin.provider.onKeyPressed(event.key, state));
     }
     Promise.all(allPresses).then((states) => {
       let resolvedStates = this.resolveStateChanges(states.flat());
