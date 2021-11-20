@@ -13,6 +13,7 @@ import {
   EditorState,
   SourcPlugin,
   PluginConfig,
+  ListOfProviders,
 } from "../../plugin";
 
 const SpecialKeys = Object.freeze(
@@ -150,4 +151,4 @@ class CorePluginProvider extends PluginProvider {
   }
 }
 
-export const CorePlugin = new CorePluginProvider();
+export const CorePlugin = new ListOfProviders([new CorePluginProvider()]);

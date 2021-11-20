@@ -1,5 +1,5 @@
-import { CaretSelection } from './tool/dom-tools';
-import { StateChange } from './state';
+import { CaretSelection } from '../tool/dom-tools';
+import { StateChange } from '../state';
 
 /**
  * Contains mutable state for the editor.
@@ -74,3 +74,5 @@ export class SourcPlugin {
     public readonly config: PluginConfig
   ) {}
 }
+
+export * from "./util";
