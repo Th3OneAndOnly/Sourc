@@ -1,4 +1,5 @@
 import { CaretSelection } from '../tool/dom-tools';
+import { LoggerPool } from '../logger';
 import { StateChange } from '../state';
 
 /**
@@ -38,7 +39,7 @@ export class EditorState {
  * message when the user types an "a":
  * ```typescript
  * //...
- * override onKeyPressed(key: string, state: EditorState) {  // We could totally omit state if we wanted.
+ * override async onKeyPressed(key: string, state: EditorState): Promise<StateChange[]> {  // We could totally omit state if we wanted.
  *   if (key == "a") {
  *     CLIENT_LOGGER.INFO(`"A" key pressed!`);
  *   }

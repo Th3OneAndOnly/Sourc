@@ -6,13 +6,12 @@ import {
   StateChange
   } from '../../state';
 import { findLineOffset, pp } from '../../tool/string';
-import { FunctionDispatcher } from '../../tool/general';
+import { FunctionDispatcher, nullCall } from '../../tool/general';
 import { getKeyType, isSelectionFlat, KeyType } from '../../tool/dom-tools';
+import { Logger, LoggerPool } from '../../logger';
 import {
   PluginProvider,
   EditorState,
-  SourcPlugin,
-  PluginConfig,
   ListOfProviders,
 } from "../../plugin";
 
@@ -26,48 +25,57 @@ const SpecialKeys = Object.freeze(
 
 const IgnoredKeys = Object.freeze(["Meta"]);
 
-class CorePluginProvider extends PluginProvider {
+type TextDispatcher = FunctionDispatcher<
+  [string, EditorState, number],
+  StateChange[]
+>;
+const TextDispatcher = (): TextDispatcher => {
+  return FunctionDispatcher.create<
+    [string, EditorState, number],
+    StateChange[]
+  >();
+};
+
+class PluginKeyHelper extends PluginProvider {
+  protected constructor(
+    private _dispatcherCB: (
+      fb: TextDispatcher,
+      key: string,
+      state: EditorState
+    ) => void
+  ) {
+    super();
+  }
   override async onKeyPressed(
     key: string,
     state: EditorState
   ): Promise<StateChange[]> {
-    key = SpecialKeys.get(key) ?? key;
-    const type = getKeyType(key);
+    const dispatcher = TextDispatcher();
+    this._dispatcherCB(dispatcher, key, state);
+    return dispatcher.try(key, state, state.selection?.start ?? -1).flat();
+  }
+}
 
-    return new FunctionDispatcher<
-      [string, EditorState, KeyType],
-      StateChange[]
-    >()
-      .require(state.selection != null, () =>
-        CORE_LOGGER.ERROR("Key was pressed, but couldn't find the caret!")
-      )
-      .require(!IgnoredKeys.includes(key))
-      .runOne()
-      .if(type == KeyType.ArrowKey, this.handleArrowKey.bind(this))
-      .if(isSelectionFlat(state.selection!), this.handleFlatCaret.bind(this))
-      .try(key, state, type)
-      .flat();
+class TextInsertionPlugin extends PluginKeyHelper {
+  public static LOGGER: Logger = new Logger();
+
+  constructor() {
+    super((dp, key, state) => {
+      key = SpecialKeys.get(key) ?? key;
+      dp
+      .require(this.isKeyValid(key))
+      .if(
+        nullCall(isSelectionFlat, state.selection) ?? false,
+        this.flatAnyKey.bind(this)
+      );
+    });
   }
 
-  private handleFlatCaret(
-    key: string,
-    state: EditorState,
-    type: KeyType
-  ): StateChange[] {
-    const location = state.selection!.start;
-    return new FunctionDispatcher<
-      [string, EditorState, number],
-      StateChange[]
-    >()
-      .runOne()
-      .if(type == KeyType.Backspace, this.handleFlatBackspace.bind(this))
-      .if(type == KeyType.Delete, this.handleFlatDelete.bind(this))
-      .if(true, this.handleFlatKeyInsert.bind(this))
-      .try(key, state, location)
-      .flat();
+  private isKeyValid(key: string): boolean {
+    return getKeyType(key) == KeyType.Other;
   }
 
-  private handleFlatKeyInsert(
+  public flatAnyKey(
     key: string,
     _state: EditorState,
     location: number
@@ -77,8 +85,18 @@ class CorePluginProvider extends PluginProvider {
       new SetSelection({ start: location + 1, end: location + 1 }),
     ];
   }
+}
 
-  private handleFlatDelete(
+class TextDeletionPlugin extends PluginKeyHelper {
+  constructor() {
+    super((dp, key, state) => {
+      const type = getKeyType(key)
+      dp
+        .if(type == KeyType.Backspace, this.flatBackspaceKey.bind(this))
+        .if(type == KeyType.Delete, this.flatDeleteKey.bind(this))
+    });
+  }
+  private flatDeleteKey(
     _key: string,
     state: EditorState,
     location: number
@@ -87,7 +105,7 @@ class CorePluginProvider extends PluginProvider {
     return [new DeleteText(location, 1)];
   }
 
-  private handleFlatBackspace(
+  private flatBackspaceKey(
     _key: string,
     state: EditorState,
     location: number
@@ -97,7 +115,30 @@ class CorePluginProvider extends PluginProvider {
       new SetSelection({ start: location - 1, end: location - 1 }),
     ];
   }
+}
 
+class TextCommandsPluginProvider extends PluginProvider {
+  override async onKeyPressed(
+    key: string,
+    state: EditorState
+  ): Promise<StateChange[]> {
+    key = SpecialKeys.get(key) ?? key;
+    const type = getKeyType(key);
+
+    return FunctionDispatcher.create<
+      [string, EditorState, KeyType],
+      StateChange[]
+    >()
+      .require(state.selection != null, () =>
+        CORE_LOGGER.ERROR("Key was pressed, but couldn't find the caret!")
+      )
+      .require(!IgnoredKeys.includes(key))
+      .runOne()
+      .if(type == KeyType.ArrowKey, this.handleArrowKey.bind(this))
+      .try(key, state, type)
+      .flat();
+  }
+  
   private handleArrowKey(key: string, state: EditorState): StateChange[] {
     let caret = 0;
     switch (key) {
@@ -151,4 +192,16 @@ class CorePluginProvider extends PluginProvider {
   }
 }
 
-export const CorePlugin = new ListOfProviders([new CorePluginProvider()]);
+export const CorePlugin = new ListOfProviders([
+  new TextCommandsPluginProvider(),
+  new TextInsertionPlugin(),
+  new TextDeletionPlugin(),
+]);
+
+
+const LOGGER_MAP = {
+  TEXT_INSERTION: TextInsertionPlugin.LOGGER,
+} as const;
+
+export const LOGGERS = new LoggerPool(LOGGER_MAP);
+

@@ -17,12 +17,21 @@ export function clamp(min: number, max: number, num: number): number {
   return Math.min(Math.max(min, num), max);
 }
 
-// new ComposableFunction().runOne().if(cond, func).if(cond, func).withArgs().try();
+export function nullCall<T, R>(fn: (t: T) => R, obj: T | null): R | null {
+  return obj ? fn(obj) : null;
+}
 
 export class FunctionDispatcher<Params extends unknown[], Return = unknown> {
   private isRunningOne = false;
   private isValid = true;
   private runFunctions: ((...args: Params) => Return)[] = [];
+  private currentSet = true;
+
+  private constructor() {}
+
+  public static create<P extends unknown[], R>(): FunctionDispatcher<P, R> {
+    return new FunctionDispatcher<P, R>();
+  }
 
   public runOne(): this {
     this.isRunningOne = true;
@@ -35,7 +44,7 @@ export class FunctionDispatcher<Params extends unknown[], Return = unknown> {
   }
 
   public if(cond: boolean, func: (...args: Params) => Return): this {
-    if (cond) this.runFunctions.push(func);
+    if (cond && this.currentSet) this.runFunctions.push(func);
     return this;
   }
 
@@ -49,6 +58,11 @@ export class FunctionDispatcher<Params extends unknown[], Return = unknown> {
       this.isValid = false;
       onFail();
     }
+    return this;
+  }
+
+  public set(cond: boolean): this {
+    this.currentSet = cond;
     return this;
   }
 

@@ -1,4 +1,4 @@
-import { clamp, FunctionDispatcher, partial } from '../ts/core/tool/general';
+import { clamp, FunctionDispatcher, partial } from '../ts/src/tool/general';
 
 describe(partial, () => {
   let sideEffect = false;
@@ -57,13 +57,13 @@ describe(FunctionDispatcher, () => {
 
   describe("#runOne and #runAny", () => {
     it("runs any by default", () => {
-      new FunctionDispatcher()
+      FunctionDispatcher.create()
         .if(true, handleOnState1)
         .if(true, handleOnState2)
         .if(false, handleOnState3)
         .try();
       expect(output).toEqual(0);
-      new FunctionDispatcher()
+      FunctionDispatcher.create()
         .runAny()
         .if(true, handleOnState1)
         .if(true, handleOnState2)
@@ -73,7 +73,7 @@ describe(FunctionDispatcher, () => {
     });
 
     it("can run the first valid function", () => {
-      new FunctionDispatcher()
+      FunctionDispatcher.create()
         .runOne()
         .if(true, handleOnState1)
         .if(true, handleOnState2)
@@ -85,13 +85,13 @@ describe(FunctionDispatcher, () => {
 
   describe("#if", () => {
     it("only runs the function if the condition is true", () => {
-      new FunctionDispatcher()
+      FunctionDispatcher.create()
         .if(false, handleOnState1)
         .if(false, handleOnState2)
         .if(false, handleOnState3)
         .try();
       expect(output).toEqual(0);
-      new FunctionDispatcher()
+      FunctionDispatcher.create()
         .if(true, handleOnState1)
         .if(false, handleOnState2)
         .if(false, handleOnState3)
@@ -102,14 +102,14 @@ describe(FunctionDispatcher, () => {
 
   describe("#require", () => {
     it("requires that the condition is true for any functions to run", () => {
-      new FunctionDispatcher()
+      FunctionDispatcher.create()
         .require(false)
         .if(false, handleOnState1)
         .if(true, handleOnState2)
         .if(false, handleOnState3)
         .try();
       expect(output).toEqual(0);
-      new FunctionDispatcher()
+      FunctionDispatcher.create()
         .require(true)
         .if(false, handleOnState1)
         .if(true, handleOnState2)
@@ -119,7 +119,7 @@ describe(FunctionDispatcher, () => {
     });
 
     it("runs a function on that specific failure", () => {
-      new FunctionDispatcher()
+      FunctionDispatcher.create()
         .require(true, () => (output = 20))
         .require(false, () => (output = 10))
         .if(false, handleOnState1)
@@ -132,7 +132,7 @@ describe(FunctionDispatcher, () => {
 
   describe("#try", () => {
     it("does not run anything until called", () => {
-      let state = new FunctionDispatcher()
+      let state = FunctionDispatcher.create()
         .if(true, handleOnState1)
         .if(false, handleOnState2)
         .if(true, handleOnState3);
@@ -142,7 +142,7 @@ describe(FunctionDispatcher, () => {
     });
 
     it("executes based on the order of the #if calls", () => {
-      let state = new FunctionDispatcher()
+      let state = FunctionDispatcher.create()
         .if(true, handleOnState3)
         .if(true, handleOnState1)
         .if(false, handleOnState2);
@@ -152,7 +152,7 @@ describe(FunctionDispatcher, () => {
     });
 
     it("accepts parameters", () => {
-      let state = new FunctionDispatcher<[number]>()
+      let state = FunctionDispatcher.create<[number], void>()
         .if(true, (amount) => {
           for (let i = 0; i < amount; i++) {
             handleOnState1();
@@ -173,4 +173,30 @@ describe(FunctionDispatcher, () => {
       expect(output).toEqual(24);
     });
   });
+
+ describe("#set", () => {
+   it("creates a set of functions against a condition", () => {
+      let state = FunctionDispatcher.create<[number], void>()
+      .set(true)
+      .if(true, (amount) => {
+        for (let i = 0; i < amount; i++) {
+          handleOnState1();
+        }
+      })
+      .if(false, (amount) => {
+        for (let i = 0; i < amount; i++) {
+          handleOnState2();
+        }
+      })
+      .set(false)
+      .if(true, (amount) => {
+        for (let i = 0; i < amount; i++) {
+          handleOnState3();
+        }
+      });
+      expect(output).toEqual(0);
+      state.try(3);
+      expect(output).toEqual(3);
+   });
+ });
 });

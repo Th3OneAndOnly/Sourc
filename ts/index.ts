@@ -1,8 +1,8 @@
-export * from "./core/editor";
-export * from "./core/plugin";
-export * from "./core/logger";
-export * from "./core/loggers";
+export * from "./src/editor";
+export * from "./src/plugin";
+export * from "./src/logger";
+export * from "./src/loggers";
 
-export * from "./core/tool/assert";
-export * from "./core/tool/string";
-export * from "./core/tool/dom-tools";
+export * from "./src/tool/assert";
+export * from "./src/tool/string";
+export * from "./src/tool/dom-tools";
