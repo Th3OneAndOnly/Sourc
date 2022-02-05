@@ -1,4 +1,4 @@
-import { stringToHTML } from '../ts/core/tool/conversion';
+import { stringToHTML } from '../ts/src/tool/conversion';
 
 describe(stringToHTML, () => {
   it("appends two newlines to the end of the text", () => {
