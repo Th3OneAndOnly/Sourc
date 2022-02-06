@@ -68,15 +68,14 @@ about contributing.
 To get started, clone this repo:
 
 ```bash
-git clone https://github.com/Th3OneAndOnly/Sourc sourc-dev
-cd sourc-dev
+git clone https://github.com/Th3OneAndOnly/Sourc
 npm i
 ```
 
-Now you can use `npm run dev-ts` to make a `demo` folder containing
-everything you need to kickstart local development. There's also an
-`dev-js` for a javascript demos as well.
-You can build each by running `npm run build-lcl-demo`!
+Now you can use `npm run dev:init` to make a `demo` folder containing
+everything you need to kickstart local development. If we make changes to how the dev environment is set up
+you can run `npm run dev:update` to update your dev environment without touching any code you've written.
+You can build each by running `npm run dev:build`!
 
 To build Sourc, use `npm run build` 🏗️ and to build the docs use `npm run doc` 📖.
 
@@ -88,8 +87,8 @@ Please adhere to this project's `code of conduct`.
 
 ## Testing
 
-`npm test` runs jest on the project. Coverage data is stored in the resulting `coverage`
-folder.
+`npm test` runs jest on the project.
+If you use `npm run test:cov` instead, coverage data is stored in the resulting `coverage` folder.
 
 ## Support
 
