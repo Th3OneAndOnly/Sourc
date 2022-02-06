@@ -76,12 +76,12 @@ dropdown, coming soon 👀.</p>
 <p>Please see <code>contributing.md</code> for rules and regulations
 about contributing.</p>
 <p>To get started, clone this repo:</p>
-<pre><code class="language-bash"><span class="hl-1">git clone https://github.com/Th3OneAndOnly/Sourc sourc-dev</span><br/><span class="hl-2">cd</span><span class="hl-1"> sourc-dev</span><br/><span class="hl-1">npm i</span>
+<pre><code class="language-bash"><span class="hl-1">git clone https://github.com/Th3OneAndOnly/Sourc</span><br/><span class="hl-1">npm i</span>
 </code></pre>
-<p>Now you can use <code>npm run dev-ts</code> to make a <code>demo</code> folder containing
-everything you need to kickstart local development. There&#39;s also an
-<code>dev-js</code> for a javascript demos as well.
-You can build each by running <code>npm run build-lcl-demo</code>!</p>
+<p>Now you can use <code>npm run dev:init</code> to make a <code>demo</code> folder containing
+everything you need to kickstart local development. If we make changes to how the dev environment is set up
+you can run <code>npm run dev:update</code> to update your dev environment without touching any code you&#39;ve written.
+You can build each by running <code>npm run dev:build</code>!</p>
 <p>To build Sourc, use <code>npm run build</code> 🏗️ and to build the docs use <code>npm run doc</code> 📖.</p>
 <p>Now, hack away! 🔨 Thank you so much for making a
 contribution, please make a pull request in the repo
@@ -91,8 +91,8 @@ after checking your PR with <code>contributing.md</code>.</p>
 <a href="#testing" id="testing" style="color: inherit; text-decoration: none;">
   <h2>Testing</h2>
 </a>
-<p><code>npm test</code> runs jest on the project. Coverage data is stored in the resulting <code>coverage</code>
-folder.</p>
+<p><code>npm test</code> runs jest on the project.
+If you use <code>npm run test:cov</code> instead, coverage data is stored in the resulting <code>coverage</code> folder.</p>
 
 <a href="#support" id="support" style="color: inherit; text-decoration: none;">
   <h2>Support</h2>
