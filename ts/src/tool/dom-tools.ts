@@ -122,10 +122,7 @@ function createRange(node: Node, offset: number): Range {
   range.selectNode(node);
   range.setStart(node, 0);
 
-  const [child, front] = findOffsetIntoNode(
-    node,
-    DOM_TOOLS_LOGGER.TRACK(offset, "offsetIntoNode")
-  );
+  const [child, front] = findOffsetIntoNode(node, offset);
   assert(DOM_TOOLS_LOGGER, child != null, "Child was null!");
   range.setEnd(child, front);
 

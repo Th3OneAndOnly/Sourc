@@ -8,16 +8,16 @@
     "email": "209th3oneandonly@gmail.com"
   },
   "scripts": {
-    "start": "npx concurrently --names \"npm run build:watch\" \"npm run dev:build:watch\" \"npx live-server . --open=demo/demo-app\"",
+    "start": "npx concurrently --kill-others \"npm run watch:build\" \"npm run watch:dev\" \"npx live-server . --open=demo/demo-app\"",
     "doc": "npx typedoc",
     "build": "npx tsc",
-    "build:watch": "npx tsc --watch",
+    "watch:build": "npx tsc --watch",
     "test": "npx jest",
     "test:cov": "npx jest --coverage",
-    "dev:ts": "node dev-ts.js",
-    "dev:js": "node dev-js.js",
-    "dev:build": "node demo/build.js N",
-    "dev:build:watch": "node demo/build.js Y"
+    "dev:init": "node dev-init.js",
+    "dev:update": "node dev-init.js",
+    "dev:build": "npx tsc -p demo/tsconfig.json && npx webpack --config demo/webpack.config.js",
+    "watch:dev": "npx concurrently --names --kill-others \"npx tsc --watch -p demo/tsconfig.json\" \"npx webpack --watch --config demo/webpack.config.js\""
   },
   "keywords": [
     "editor",
@@ -35,13 +35,10 @@
     "@types/jest": "^27.0.1",
     "concurrently": "^7.0.0",
     "jest": "^27.1.0",
-    "live-server": "^1.2.1",
+    "live-server": "github:lil5/live-server#55b44cf32b6e213d788588a865a63848d619eab2",
     "ts-jest": "^27.0.7",
     "ts-node": "^10.2.1",
     "typedoc": "^0.22.0",
     "typescript": "^4.4.2"
-  },
-  "dependencies": {
-    "tslib": "^1.14.1"
   }
 }
