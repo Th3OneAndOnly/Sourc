@@ -5,7 +5,7 @@ import {
   SetSelection,
   StateChange
   } from '../../state';
-import { findLineOffset, pp } from '../../tool/string';
+import { findLineOf, findLineOffset, pp } from '../../tool/string';
 import { FunctionDispatcher, nullCall } from '../../tool/general';
 import { getKeyType, isSelectionFlat, KeyType } from '../../tool/dom-tools';
 import { Logger, LoggerPool } from '../../logger';
@@ -66,7 +66,7 @@ class TextInsertionPlugin extends PluginKeyHelper {
       .require(this.isKeyValid(key))
       .if(
         nullCall(isSelectionFlat, state.selection) ?? false,
-        this.flatAnyKey.bind(this)
+        (_, state, location) => this.flatAnyKey.bind(this)(key, state, location)
       );
     });
   }
@@ -117,85 +117,97 @@ class TextDeletionPlugin extends PluginKeyHelper {
   }
 }
 
+class ArrowKeyPlugin extends PluginKeyHelper {
+  constructor() {
+    super((dp, key, state) => {
+      const type = getKeyType(key)
+      dp
+        .require(type == KeyType.ArrowKey)
+        .if(key == "ArrowUp", (_, state) => this.handleUpArrow.bind(this)(state))
+        .if(key == "ArrowDown", (_, state) => this.handleDownArrow.bind(this)(state))
+        .if(key == "ArrowLeft", (_, state) => this.handleLeftArrow.bind(this)(state))
+        .if(key == "ArrowRight", (_, state) => this.handleRightArrow.bind(this)(state))
+    });
+  }
+
+  private handleDownArrow(state: EditorState): StateChange[] {
+    const pos = state.selection!.end;
+    const lines = state.content.split("\n");
+    const lineNum = findLineOf(state.content, pos);
+    const lineOffset = findLineOffset(state.content, pos);
+    const lineLength = lines[lineNum]?.length + 1;
+    const nextLineLength = lines[lineNum + 1]?.length + 1;
+    const restOfLine = lineLength - lineOffset;
+    let offset = lineOffset + (nextLineLength < lineOffset ? nextLineLength : restOfLine);
+    // let offset: number;
+    // if (lineOffset >= lineLength) {
+    //   offset = lineLength + prevLineLength - lineOffset - 1;
+    // } else {
+    //   offset = prevLineLength
+    // }
+    
+    
+    const caret = pos + offset;
+    return [new SetSelection({ start: caret, end: caret })];
+  }
+
+  private handleUpArrow(state: EditorState): StateChange[] {
+    const pos = state.selection!.start;
+    const lines = state.content.split("\n");
+    const lineNum = findLineOf(state.content, pos);
+    const lineLength = lines[lineNum]?.length + 1;
+    const lineOffset = findLineOffset(state.content, pos);
+    let offset: number;
+    if (lineOffset >= lineLength) {
+      offset = 1 + lineOffset;
+    } else {
+      offset = lineLength;
+    }
+    const caret = pos - offset;
+    return [new SetSelection({ start: caret, end: caret })];
+  }
+
+  private handleLeftArrow(state: EditorState): StateChange[] {
+    const caret = state.selection!.start - 1;
+    return [new SetSelection({ start: caret, end: caret })];
+  }
+
+  private handleRightArrow(state: EditorState): StateChange[] {
+    const caret = state.selection!.end + 1;
+    return [new SetSelection({ start: caret, end: caret })];
+  }
+}
+
 class TextCommandsPluginProvider extends PluginProvider {
   override async onKeyPressed(
     key: string,
     state: EditorState
   ): Promise<StateChange[]> {
-    key = SpecialKeys.get(key) ?? key;
-    const type = getKeyType(key);
+    return [];
+    // key = SpecialKeys.get(key) ?? key;
+    // const type = getKeyType(key);
 
-    return FunctionDispatcher.create<
-      [string, EditorState, KeyType],
-      StateChange[]
-    >()
-      .require(state.selection != null, () =>
-        CORE_LOGGER.ERROR("Key was pressed, but couldn't find the caret!")
-      )
-      .require(!IgnoredKeys.includes(key))
-      .runOne()
-      .if(type == KeyType.ArrowKey, this.handleArrowKey.bind(this))
-      .try(key, state, type)
-      .flat();
+    // return FunctionDispatcher.create<
+    //   [string, EditorState, KeyType],
+    //   StateChange[]
+    // >()
+    //   .require(state.selection != null, () =>
+    //     CORE_LOGGER.ERROR("Key was pressed, but couldn't find the caret!")
+    //   )
+    //   .require(!IgnoredKeys.includes(key))
+    //   .runOne()
+    //   .try(key, state, type)
+    //   .flat();
   }
   
-  private handleArrowKey(key: string, state: EditorState): StateChange[] {
-    let caret = 0;
-    switch (key) {
-      case "ArrowUp": {
-        const pos = state.selection!.start;
-        const lines = state.content.split("\n");
-        const lineNum =
-          state.content
-            .split("")
-            .slice(0, pos)
-            .filter((ch) => ch == "\n").length - 1;
-        const lineLength = lines[lineNum]?.length + 1;
-        const lineOffset = findLineOffset(state.content, pos);
-        let offset: number;
-        if (lineOffset >= lineLength) {
-          offset = 1 + lineOffset;
-        } else {
-          offset = lineLength;
-        }
-        caret = pos - offset;
-        break;
-      }
-      case "ArrowDown": {
-        const pos = state.selection!.end;
-        const lines = state.content.split("\n");
-        const lineNum =
-          state.content
-            .split("")
-            .slice(0, pos)
-            .filter((ch) => ch == "\n").length + 1;
-        const lineLength = lines[lineNum]?.length + 1;
-        const prevLineLength = lines[lineNum - 1]?.length + 1;
-        const lineOffset = findLineOffset(state.content, pos);
-        let offset: number;
-        if (lineOffset >= lineLength) {
-          offset = lineLength + prevLineLength - lineOffset - 1;
-        } else {
-          offset = prevLineLength;
-        }
-        caret = pos + offset;
-        break;
-      }
-      case "ArrowLeft":
-        caret = state.selection!.start - 1;
-        break;
-      case "ArrowRight":
-        caret = state.selection!.end + 1;
-        break;
-    }
-    return [new SetSelection({ start: caret, end: caret })];
-  }
+  
 }
 
 export const CorePlugin = new ListOfProviders([
-  new TextCommandsPluginProvider(),
+  // new TextCommandsPluginProvider(),
   new TextInsertionPlugin(),
   new TextDeletionPlugin(),
+  new ArrowKeyPlugin(),
 ]);
 
 
