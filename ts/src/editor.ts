@@ -83,7 +83,7 @@ export class TextEditor {
    * @param editor The element the editor will use to run.
    */
   constructor(
-    private readonly editor: HTMLDivElement,
+    private readonly editor: HTMLElement,
     config: PluginSettings = {}
   ) {
     const core = new SourcPlugin(CorePlugin, new PluginConfig(config));

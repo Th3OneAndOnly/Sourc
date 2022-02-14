@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `StatefulFunction` -> `FunctionDispatcher`
 - `new FunctionDispatcher` -> `FunctionDispatcher.create`
+- `new TextEditor` now requires an `HTMLElement` as opposed to an `HTMLDivElement`.
 
 ## [0.0.6] - 10/23/2021
 
