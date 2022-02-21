@@ -9,6 +9,7 @@ import {
 import { EditorState, ListOfProviders, PluginProvider } from '../../plugin';
 import { findLineOf, findLineOffset, pp } from '../../tool/string';
 import { FunctionDispatcher, nullCall } from '../../tool/general';
+import { KeyState } from '../../editor';
 import { Logger, LoggerPool } from '../../logger';
 import {
   getKeyType,
@@ -211,31 +212,7 @@ class ArrowKeyPlugin extends PluginKeyHelper {
   }
 }
 
-class TextCommandsPluginProvider extends PluginProvider {
-  override async onKeyPressed(
-    key: string,
-    state: EditorState
-  ): Promise<StateChange[]> {
-    return [];
-    // key = SpecialKeys.get(key) ?? key;
-    // const type = getKeyType(key);
-
-    // return FunctionDispatcher.create<
-    //   [string, EditorState, KeyType],
-    //   StateChange[]
-    // >()
-    //   .require(state.selection != null, () =>
-    //     CORE_LOGGER.ERROR("Key was pressed, but couldn't find the caret!")
-    //   )
-    //   .require(!IgnoredKeys.includes(key))
-    //   .runOne()
-    //   .try(key, state, type)
-    //   .flat();
-  }
-}
-
 export const CorePlugin = new ListOfProviders([
-  // new TextCommandsPluginProvider(),
   new TextInsertionPlugin(),
   new TextDeletionPlugin(),
   new ArrowKeyPlugin(),

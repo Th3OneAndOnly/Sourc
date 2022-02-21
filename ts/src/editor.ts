@@ -35,7 +35,7 @@ const ModifierMap = Object.freeze(
   )
 );
 
-type KeyState = { mods: Modifiers };
+export type KeyState = { mods: Modifiers };
 
 type EditorContent = { current: string; previous: string };
 
