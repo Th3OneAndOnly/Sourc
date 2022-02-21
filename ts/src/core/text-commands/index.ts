@@ -1,3 +1,4 @@
+import { assert } from '../../tool/assert';
 import { CORE_LOGGER } from '../../private-loggers';
 import {
   DeleteText,
@@ -8,8 +9,13 @@ import {
 import { EditorState, ListOfProviders, PluginProvider } from '../../plugin';
 import { findLineOf, findLineOffset, pp } from '../../tool/string';
 import { FunctionDispatcher, nullCall } from '../../tool/general';
-import { getKeyType, isSelectionFlat, KeyType } from '../../tool/dom-tools';
 import { Logger, LoggerPool } from '../../logger';
+import {
+  getKeyType,
+  getSelectionLength,
+  isSelectionFlat,
+  KeyType,
+} from "../../tool/dom-tools";
 
 const SpecialKeys = Object.freeze(
   new Map(
@@ -91,13 +97,27 @@ class TextDeletionPlugin extends PluginKeyHelper {
       );
     });
   }
+
   private flatDeleteKey(
     _key: string,
     state: EditorState,
     location: number
   ): StateChange[] {
     if (location >= state.content.length) return [];
-    return [new DeleteText(location, 1)];
+    assert(
+      CORE_LOGGER,
+      state.selection != null,
+      "State selection was null when deleting!"
+    );
+    if (isSelectionFlat(state.selection))
+      return [
+        new DeleteText(location, 1),
+        new SetSelection({ start: location + 1, end: location + 1 }),
+      ];
+    return [
+      new DeleteText(location, 1),
+      new SetSelection({ start: location, end: location }),
+    ];
   }
 
   private flatBackspaceKey(
@@ -105,9 +125,21 @@ class TextDeletionPlugin extends PluginKeyHelper {
     state: EditorState,
     location: number
   ): StateChange[] {
+    if (location <= 0) return [];
+    assert(
+      CORE_LOGGER,
+      state.selection != null,
+      "State selection was null when deleting!"
+    );
+    if (isSelectionFlat(state.selection))
+      return [
+        new DeleteText(location - 1, 1),
+        new SetSelection({ start: location - 1, end: location - 1 }),
+      ];
+
     return [
-      new DeleteText(location - 1, 1),
-      new SetSelection({ start: location - 1, end: location - 1 }),
+      new DeleteText(location, getSelectionLength(state.selection)),
+      new SetSelection({ start: location, end: location }),
     ];
   }
 }

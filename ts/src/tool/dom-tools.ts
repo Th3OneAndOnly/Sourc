@@ -26,6 +26,10 @@ export function normalizeSelection(caret: CaretSelection): CaretSelection {
   else return caret;
 }
 
+export function getSelectionLength(caret: CaretSelection): number {
+  return caret.end - caret.start;
+}
+
 /**
  * Clamps selection to a range of numbers
  * @param selection - selection to clamp
