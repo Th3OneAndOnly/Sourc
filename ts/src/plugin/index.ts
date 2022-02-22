@@ -30,13 +30,16 @@ export class EditorState {
  * The provider for code injection and plugin creation, used for creating new plugins.
  * Let's create one now!
  * Start by sub-classing PluginProvider:
+ *
  * ```typescript
- *  class MyPlugin extends PluginProvider {
+ * class MyPlugin extends PluginProvider {
  *
  * }
  * ```
+ *
  * Next override any functions you need. Let's override onKeyPressed, and log a
  * message when the user types an "a":
+ *
  * ```typescript
  * //...
  * override async onKeyPressed(key: string, state: EditorState): Promise<StateChange[]> {  // We could totally omit state if we wanted.
@@ -46,7 +49,8 @@ export class EditorState {
  * }
  * //...
  * ```
- * Now you just create a new {@link Plugin} and register it, and you see the messages in the console!
+ *
+ * Now you just create a new {@link SourcPlugin} and register it, and you see the messages in the console!
  */
 export abstract class PluginProvider {
   public async onInitialize() {}
